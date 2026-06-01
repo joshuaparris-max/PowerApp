@@ -13,17 +13,11 @@ export default function BreathingTool({ C, s }) {
       interval = setInterval(() => {
         setSeconds((prev) => {
           if (prev === 1) {
-            // Switch phases
-            setPhase((p) => {
-              if (p === "Inhale") return "Hold";
-              if (p === "Hold" && phase === "Hold") return "Exhale"; // Simplified logic below
-              return p;
-            });
-            // Better phase logic:
+            // Switch phases in order: Inhale -> Hold (In) -> Exhale -> Hold (Out)
             setPhase((currentPhase) => {
-              if (currentPhase === "Inhale") return "Hold ";
+              if (currentPhase === "Inhale") return "Hold "; // Hold after inhale
               if (currentPhase === "Hold ") return "Exhale";
-              if (currentPhase === "Exhale") return "Hold";
+              if (currentPhase === "Exhale") return "Hold";  // Hold after exhale
               return "Inhale";
             });
             return 4;
@@ -40,7 +34,16 @@ export default function BreathingTool({ C, s }) {
     return () => clearInterval(interval);
   }, [isActive]);
 
-  const size = isActive ? (phase.includes("Inhale") ? 200 : phase === "Exhale" ? 120 : 160) : 160;
+  // Visual size logic: Inhale grows, Hold stays large, Exhale shrinks, Hold stays small
+  const getVisualSize = () => {
+    if (!isActive) return 160;
+    if (phase === "Inhale") return 220;
+    if (phase === "Hold ") return 220;
+    if (phase === "Exhale") return 120;
+    return 120; // Hold (Out)
+  };
+
+  const size = getVisualSize();
 
   return (
     <div style={{ ...s.card, textAlign: "center", padding: "32px 24px", overflow: "hidden" }}>
@@ -55,9 +58,9 @@ export default function BreathingTool({ C, s }) {
         <div style={{
           width: size, height: size,
           borderRadius: "50%",
-          background: C.accentLight,
-          opacity: 0.2,
-          transition: "all 4s linear",
+          background: C.accent,
+          opacity: 0.15,
+          transition: phase === "Inhale" || phase === "Exhale" ? "all 4s linear" : "none",
           position: "absolute"
         }} />
         <div style={{
@@ -73,19 +76,21 @@ export default function BreathingTool({ C, s }) {
       </div>
 
       <h3 style={{ fontFamily: font.serif, fontSize: 24, color: C.ink, marginBottom: 8, height: 32 }}>
-        {isActive ? phase : "Box Breathing"}
+        {isActive ? phase.trim() : "Box Breathing"}
       </h3>
       
       <p style={{ ...s.p, fontSize: 14, marginBottom: 24, opacity: 0.7 }}>
         {isActive ? "Follow the circle and the count." : "4s Inhale • 4s Hold • 4s Exhale • 4s Hold"}
       </p>
 
-      <button 
-        onClick={() => setIsActive(!isActive)}
-        style={{ ...s.btn(isActive ? "outline" : "primary"), width: "100%" }}
-      >
-        {isActive ? "Stop" : "Start Exercise"}
-      </button>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button 
+          onClick={() => setIsActive(!isActive)}
+          style={{ ...s.btn(isActive ? "outline" : "primary"), flex: 1 }}
+        >
+          {isActive ? "Stop" : "Start Exercise"}
+        </button>
+      </div>
 
       {totalSeconds > 0 && !isActive && (
         <p style={{ ...s.p, fontSize: 12, marginTop: 12, marginBottom: 0 }}>

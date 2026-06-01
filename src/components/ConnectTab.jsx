@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
+import { getLocal, setLocal } from "../utils/storage";
 
 const conversationCards = [
   { prompt: "What made you curious about exploring this together?", category: "Curiosity" },
@@ -32,22 +33,22 @@ const beginner_activities = [
 ];
 
 export default function ConnectTab({ C, s }) {
-  const [view, setView] = useState(() => localStorage.getItem("connect_view") || "menu");
-  const [cardIdx, setCardIdx] = useState(() => parseInt(localStorage.getItem("connect_cardIdx")) || 0);
-  const [partnerA, setPartnerA] = useState(() => JSON.parse(localStorage.getItem("connect_partnerA")) || {});
-  const [partnerB, setPartnerB] = useState(() => JSON.parse(localStorage.getItem("connect_partnerB")) || {});
+  const [view, setView] = useState(() => getLocal("connect_view", "menu"));
+  const [cardIdx, setCardIdx] = useState(() => getLocal("connect_cardIdx", 0));
+  const [partnerA, setPartnerA] = useState(() => getLocal("connect_partnerA", {}));
+  const [partnerB, setPartnerB] = useState(() => getLocal("connect_partnerB", {}));
   const [activePartner, setActivePartner] = useState("A");
-  const [hardLimitA, setHardLimitA] = useState(() => localStorage.getItem("connect_hardLimitA") || "");
-  const [hardLimitB, setHardLimitB] = useState(() => localStorage.getItem("connect_hardLimitB") || "");
+  const [hardLimitA, setHardLimitA] = useState(() => getLocal("connect_hardLimitA", ""));
+  const [hardLimitB, setHardLimitB] = useState(() => getLocal("connect_hardLimitB", ""));
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("connect_view", view);
-    localStorage.setItem("connect_cardIdx", cardIdx);
-    localStorage.setItem("connect_partnerA", JSON.stringify(partnerA));
-    localStorage.setItem("connect_partnerB", JSON.stringify(partnerB));
-    localStorage.setItem("connect_hardLimitA", hardLimitA);
-    localStorage.setItem("connect_hardLimitB", hardLimitB);
+    setLocal("connect_view", view);
+    setLocal("connect_cardIdx", cardIdx);
+    setLocal("connect_partnerA", partnerA);
+    setLocal("connect_partnerB", partnerB);
+    setLocal("connect_hardLimitA", hardLimitA);
+    setLocal("connect_hardLimitB", hardLimitB);
   }, [view, cardIdx, partnerA, partnerB, hardLimitA, hardLimitB]);
 
   const votes = activePartner === "A" ? partnerA : partnerB;
@@ -56,41 +57,50 @@ export default function ConnectTab({ C, s }) {
   const bothYes = beginner_activities.filter(a => partnerA[a.id] === "yes" && partnerB[a.id] === "yes");
   const categories = [...new Set(beginner_activities.map(a => a.category))];
 
+  // Progress calculations
+  const cardsCompleted = cardIdx + 1 === conversationCards.length;
+  const worksheetCompleted = Object.keys(partnerA).length > 0 && Object.keys(partnerB).length > 0;
+
   if (view === "conversation") return (
     <div style={s.page}>
-      <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back</button>
+      <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back to Menu</button>
       <p style={s.label}>Conversation Guide</p>
       <h1 style={s.h1}>Card {cardIdx + 1} of {conversationCards.length}</h1>
-      <p style={{ ...s.p, fontSize: 13 }}>Have this conversation fully clothed, outside the bedroom, with no expectations.</p>
+      <p style={{ ...s.p, fontSize: 14 }}>Have this conversation fully clothed, outside the bedroom, with no expectations.</p>
 
       <div style={{
-        background: C.ink, color: C.cream, borderRadius: 12, padding: "32px 24px",
-        minHeight: 160, display: "flex", flexDirection: "column", justifyContent: "space-between",
-        marginBottom: 20, boxShadow: "0 4px 20px rgba(44,36,22,0.15)"
+        background: C.ink, color: C.cream, borderRadius: 12, padding: "40px 28px",
+        minHeight: 180, display: "flex", flexDirection: "column", justifyContent: "space-between",
+        marginBottom: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.15)"
       }}>
-        <span style={{ ...s.pill(C.accentLight, "rgba(196,168,130,0.2)"), marginBottom: 16, fontSize: 11 }}>
+        <span style={{ ...s.pill(C.accentLight, "rgba(196,168,130,0.1)"), marginBottom: 20, fontSize: 11, alignSelf: "flex-start" }}>
           {conversationCards[cardIdx].category}
         </span>
-        <p style={{ fontFamily: font.serif, fontSize: 22, lineHeight: 1.4, color: C.cream, margin: 0 }}>
+        <p style={{ fontFamily: font.serif, fontSize: 24, lineHeight: 1.4, color: C.cream, margin: 0 }}>
           "{conversationCards[cardIdx].prompt}"
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={() => setCardIdx(Math.max(0, cardIdx - 1))} style={{ ...s.btn("outline"), flex: 1 }} disabled={cardIdx === 0}>
-          ← Prev
+      <div style={{ display: "flex", gap: 12 }}>
+        <button 
+          onClick={() => setCardIdx(Math.max(0, cardIdx - 1))} 
+          style={{ ...s.btn("outline"), flex: 1 }} 
+          disabled={cardIdx === 0}
+        >
+          Previous
         </button>
         {cardIdx < conversationCards.length - 1
-          ? <button onClick={() => setCardIdx(cardIdx + 1)} style={{ ...s.btn(), flex: 1 }}>Next →</button>
-          : <button onClick={() => setView("menu")} style={{ ...s.btn(), flex: 1, background: C.sage }}>Done ✓</button>
+          ? <button onClick={() => setCardIdx(cardIdx + 1)} style={{ ...s.btn(), flex: 1 }}>Next Card</button>
+          : <button onClick={() => setView("menu")} style={{ ...s.btn(), flex: 1, background: C.sage }}>Finish Guide</button>
         }
       </div>
 
-      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 16, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 24, flexWrap: "wrap" }}>
         {conversationCards.map((_, i) => (
           <div key={i} onClick={() => setCardIdx(i)} style={{
             width: 8, height: 8, borderRadius: "50%", cursor: "pointer",
-            background: i === cardIdx ? C.accent : i < cardIdx ? C.accentLight : C.rule,
+            background: i === cardIdx ? C.accent : i < cardIdx ? C.sage : C.rule,
+            transition: "all 0.2s"
           }} />
         ))}
       </div>
@@ -99,26 +109,30 @@ export default function ConnectTab({ C, s }) {
 
   if (view === "worksheet") return (
     <div style={s.page}>
-      <button onClick={() => { setView("menu"); setShowResults(false); }} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back</button>
+      <button onClick={() => { setView("menu"); setShowResults(false); }} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back to Menu</button>
       <p style={s.label}>Boundary Worksheet</p>
       <h1 style={s.h1}>Yes / No / Maybe</h1>
 
       {!showResults ? (
         <>
-          <div style={{ ...s.safeBox, marginBottom: 16 }}>
-            <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>
-              Each partner fills this in <strong>separately</strong>. Only activities where <strong>both</strong> mark Yes will appear on the safe list. Fill yours in, then swap.
+          <div style={{ ...s.safeBox, marginBottom: 20 }}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 8 }}>
+              Each partner fills this in <strong>separately</strong>. Only activities where <strong>both</strong> mark Yes will appear on the safe list.
+            </p>
+            <p style={{ ...s.p, fontSize: 13, marginBottom: 0, opacity: 0.8 }}>
+              <strong>Important:</strong> "Maybe" is not permission. It means "I'm curious but need to talk more first."
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
             {["A", "B"].map(p => (
               <button key={p} onClick={() => setActivePartner(p)} style={{
-                flex: 1, padding: "10px", borderRadius: 6, cursor: "pointer",
-                fontFamily: font.sans, fontSize: 13, fontWeight: 700,
+                flex: 1, padding: "12px", borderRadius: 8, cursor: "pointer",
+                fontFamily: font.sans, fontSize: 14, fontWeight: 700,
                 background: activePartner === p ? C.ink : C.warmWhite,
                 color: activePartner === p ? C.cream : C.softInk,
                 border: `1px solid ${activePartner === p ? C.ink : C.rule}`,
+                transition: "all 0.2s"
               }}>
                 Partner {p}
               </button>
@@ -126,16 +140,16 @@ export default function ConnectTab({ C, s }) {
           </div>
 
           {categories.map(cat => (
-            <div key={cat} style={{ marginBottom: 16 }}>
+            <div key={cat} style={{ marginBottom: 20 }}>
               <span style={{ ...s.label, color: C.accent }}>{cat}</span>
               {beginner_activities.filter(a => a.category === cat).map(act => (
-                <div key={act.id} style={{ ...s.card, padding: "12px 14px", marginBottom: 6 }}>
-                  <p style={{ ...s.p, fontSize: 14, marginBottom: 10 }}>{act.label}</p>
-                  <div style={{ display: "flex", gap: 6 }}>
+                <div key={act.id} style={{ ...s.card, padding: "16px", marginBottom: 8 }}>
+                  <p style={{ ...s.p, fontSize: 15, marginBottom: 12 }}>{act.label}</p>
+                  <div style={{ display: "flex", gap: 8 }}>
                     {["yes", "maybe", "no"].map(opt => (
                       <button key={opt} onClick={() => setVotes({ ...votes, [act.id]: opt })} style={{
-                        flex: 1, padding: "6px 4px", borderRadius: 4, cursor: "pointer",
-                        fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
+                        flex: 1, padding: "8px 4px", borderRadius: 6, cursor: "pointer",
+                        fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
                         border: "1px solid",
                         background: votes[act.id] === opt
                           ? (opt === "yes" ? C.sage : opt === "maybe" ? "#c4a010" : "#c44a3a")
@@ -144,6 +158,7 @@ export default function ConnectTab({ C, s }) {
                         borderColor: votes[act.id] === opt
                           ? (opt === "yes" ? C.sage : opt === "maybe" ? "#c4a010" : "#c44a3a")
                           : C.rule,
+                        transition: "all 0.2s"
                       }}>
                         {opt}
                       </button>
@@ -155,43 +170,43 @@ export default function ConnectTab({ C, s }) {
           ))}
 
           <hr style={s.divider} />
-          <div style={{ marginBottom: 20 }}>
-            <span style={s.label}>Partner A — Hard Limits (never, no exceptions)</span>
+          <div style={{ marginBottom: 24 }}>
+            <span style={s.label}>Partner A — Hard Limits</span>
             <textarea style={s.input} rows={3} value={hardLimitA} onChange={e => setHardLimitA(e.target.value)}
-              placeholder="Write any hard limits here..." />
-            <span style={s.label}>Partner B — Hard Limits (never, no exceptions)</span>
+              placeholder="List items that are completely off the table..." />
+            <span style={s.label}>Partner B — Hard Limits</span>
             <textarea style={s.input} rows={3} value={hardLimitB} onChange={e => setHardLimitB(e.target.value)}
-              placeholder="Write any hard limits here..." />
+              placeholder="List items that are completely off the table..." />
           </div>
 
-          <button onClick={() => setShowResults(true)} style={{ ...s.btn(), width: "100%" }}>
-            Compare Lists →
+          <button onClick={() => setShowResults(true)} style={{ ...s.btn(), width: "100%", padding: "14px" }}>
+            Compare Mutual List
           </button>
         </>
       ) : (
         <>
-          <div style={{ ...s.safeBox, marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <span style={{ ...s.label, color: C.sage, marginBottom: 0 }}>✓ Safe to Try Together</span>
+          <div style={{ ...s.safeBox, marginBottom: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ ...s.label, color: C.sage, marginBottom: 0 }}>✓ Mutual Yes List</span>
               {bothYes.length > 0 && (
                 <button 
                   onClick={() => {
                     const text = bothYes.map(a => `✓ ${a.label}`).join("\n");
-                    navigator.clipboard.writeText(`Mutual Safe List:\n${text}`);
+                    navigator.clipboard.writeText(`Our Mutual Safe List:\n${text}`);
                     alert("Copied to clipboard!");
                   }}
-                  style={{ ...s.btn("outline"), padding: "4px 8px", fontSize: 11 }}
+                  style={{ ...s.btn("outline"), padding: "6px 12px", fontSize: 11 }}
                 >
-                  Copy
+                  Copy List
                 </button>
               )}
             </div>
-            <p style={{ ...s.p, fontSize: 13, marginBottom: 10 }}>Only activities where both partners marked Yes.</p>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>Only activities where both partners marked Yes.</p>
             {bothYes.length === 0
-              ? <p style={{ color: C.muted, fontSize: 14, fontStyle: "italic" }}>No mutual Yes items yet — that's okay. Have more conversation first.</p>
+              ? <p style={{ color: C.muted, fontSize: 14, fontStyle: "italic" }}>No mutual items yet. This is a great time for more conversation.</p>
               : bothYes.map(a => (
-                <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: `1px solid ${C.rule}` }}>
-                  <span style={{ color: C.sage, fontSize: 16 }}>✓</span>
+                <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: `1px solid ${C.rule}` }}>
+                  <span style={{ color: C.sage, fontSize: 18 }}>✓</span>
                   <span style={{ color: C.softInk, fontSize: 14 }}>{a.label}</span>
                 </div>
               ))
@@ -200,14 +215,14 @@ export default function ConnectTab({ C, s }) {
 
           {(hardLimitA || hardLimitB) && (
             <div style={s.warnBox}>
-              <span style={{ ...s.label, color: C.warnBorder }}>⚑ Hard Limits — Always Respected</span>
-              {hardLimitA && <p style={{ ...s.p, fontSize: 13, marginBottom: 4 }}><strong>Partner A:</strong> {hardLimitA}</p>}
-              {hardLimitB && <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}><strong>Partner B:</strong> {hardLimitB}</p>}
+              <span style={{ ...s.label, color: C.warnBorder }}>⚑ Shared Hard Limits</span>
+              {hardLimitA && <p style={{ ...s.p, fontSize: 14, marginBottom: 8 }}><strong>Partner A:</strong> {hardLimitA}</p>}
+              {hardLimitB && <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}><strong>Partner B:</strong> {hardLimitB}</p>}
             </div>
           )}
 
-          <button onClick={() => setShowResults(false)} style={{ ...s.btn("outline"), width: "100%", marginTop: 8 }}>
-            ← Edit Responses
+          <button onClick={() => setShowResults(false)} style={{ ...s.btn("outline"), width: "100%", marginTop: 12 }}>
+            Edit Responses
           </button>
         </>
       )}
@@ -216,31 +231,47 @@ export default function ConnectTab({ C, s }) {
 
   return (
     <div style={s.page}>
-      <p style={s.label}>Communication Tools</p>
+      <p style={s.label}>Step 2</p>
       <h1 style={s.h1}>Connect</h1>
-      <p style={s.p}>These tools are designed for use fully clothed, outside the bedroom, before anything else.</p>
+      <p style={s.p}>These tools help you talk and align before any physical exploration.</p>
+      
       <div style={{ ...s.warnBox }}>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>
-          <strong>Reminder:</strong> A good conversation that ends without physical exploration is a complete and successful evening.
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+          <strong>Reminder:</strong> "Maybe" is a "No" until it becomes a clear "Yes" through safe, open conversation.
         </p>
       </div>
+
       <hr style={s.divider} />
+
       <button onClick={() => { setView("conversation"); setCardIdx(0); }} style={{
         ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`,
-        marginBottom: 12, display: "block",
+        marginBottom: 16, display: "block", position: "relative"
       }}>
-        <span style={s.label}>Step 1</span>
-        <p style={{ fontFamily: font.serif, fontSize: 20, color: C.ink, marginBottom: 4 }}>Conversation Guide</p>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>{conversationCards.length} gentle prompts to work through together, one at a time.</p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={s.label}>Part 1</span>
+          {cardsCompleted && <span style={{ color: C.sage, fontSize: 12, fontWeight: 700 }}>✓ Completed</span>}
+        </div>
+        <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Conversation Guide</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>11 gentle prompts to explore your curiosity, fears, and expectations.</p>
       </button>
+
       <button onClick={() => setView("worksheet")} style={{
         ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`,
-        display: "block",
+        display: "block", position: "relative"
       }}>
-        <span style={s.label}>Step 2</span>
-        <p style={{ fontFamily: font.serif, fontSize: 20, color: C.ink, marginBottom: 4 }}>Yes / No / Maybe Worksheet</p>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>Fill in separately, then compare. Only mutual Yes items are shown as safe to try.</p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={s.label}>Part 2</span>
+          {worksheetCompleted && <span style={{ color: C.sage, fontSize: 12, fontWeight: 700 }}>✓ Completed</span>}
+        </div>
+        <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Yes / No / Maybe Worksheet</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>Compare your boundaries and build a mutual list of safe activities.</p>
       </button>
+
+      <div style={{ ...s.safeBox, marginTop: 24 }}>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0, fontStyle: "italic" }}>
+          "Success is defined by the quality of your connection, not the level of physical activity."
+        </p>
+      </div>
     </div>
   );
 }

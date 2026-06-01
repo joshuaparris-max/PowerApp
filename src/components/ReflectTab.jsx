@@ -1,87 +1,115 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 import BreathingTool from "./BreathingTool";
+import { getLocal, setLocal } from "../utils/storage";
 
 const aftercareItems = [
-  { category: "Physical", items: ["Get warm — blanket, close together", "Drink water", "Eat something if needed", "Check for any physical discomfort or tenderness", "Slow breathing together"] },
-  { category: "Emotional", items: ["Reassure each other: 'I love you. You're safe.'", "Normalise feelings — whatever you feel is okay", "'Nothing about stopping would disappoint me.'", "Hold each other without needing to analyse anything", "If either person is tearful, just hold them"] },
-  { category: "Optional", items: ["Quiet prayer together if desired", "A warm drink and quiet time", "Watch something gentle together", "Write in a journal separately"] },
+  { category: "Physical", items: ["Get warm — blanket, close together", "Drink water", "Eat something light if needed", "Check for any physical discomfort", "Slow, synchronized breathing"] },
+  { category: "Emotional", items: ["Reassure each other: 'I love you. You're safe.'", "Normalize whatever feelings arise", "No need to analyze right away — just be present", "Hold each other without pressure", "Validating the session, regardless of how it went"] },
+  { category: "Optional", items: ["Quiet reflection or prayer together", "A warm drink", "Watch something light/gentle together", "Journal separately"] },
 ];
 
 const debriefQuestions = [
-  { q: "What felt connecting last night?", note: "Start here — name what was good." },
-  { q: "Was there anything that felt uncomfortable or not quite right?", note: "Be honest, even if it's small." },
-  { q: "Did you feel safe the whole time?", note: "If not — when did that change?" },
-  { q: "Did you feel any pressure — to continue, or to not disappoint me?", note: "This is the most important question." },
+  { q: "What felt connecting last night?", note: "Start with the positives." },
+  { q: "Did you feel safe the whole time?", note: "If not, when did that change?" },
+  { q: "Did you feel any pressure — even internal pressure?", note: "This is crucial for long-term safety." },
   { q: "Did you feel heard and respected?", note: "" },
   { q: "Is there anything you'd want to do differently?", note: "" },
-  { q: "Is there anything we should never repeat?", note: "Hard limits learned from experience." },
-  { q: "How do you feel about us this morning?", note: "" },
-  { q: "Is there anything you need from me today?", note: "End here — tend to each other." },
+  { q: "Did this session increase trust and closeness between us?", note: "Reflect on the long-term pattern." },
+  { q: "Is there anything we should never repeat?", note: "Identifying new hard limits." },
 ];
 
 export default function ReflectTab({ C, s }) {
-  const [view, setView] = useState(() => localStorage.getItem("reflect_view") || "menu");
-  const [answers, setAnswers] = useState(() => JSON.parse(localStorage.getItem("reflect_answers")) || {});
+  const [view, setView] = useState(() => getLocal("reflect_view", "menu"));
+  const [answers, setAnswers] = useState(() => getLocal("reflect_answers", {}));
+  const [notes, setNotes] = useState(() => getLocal("reflect_notes", ""));
+  const [revealNotes, setRevealNotes] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("reflect_view", view);
-    localStorage.setItem("reflect_answers", JSON.stringify(answers));
-  }, [view, answers]);
+    setLocal("reflect_view", view);
+    setLocal("reflect_answers", answers);
+    setLocal("reflect_notes", notes);
+  }, [view, answers, notes]);
 
   if (view === "aftercare") return (
     <div style={s.page}>
-      <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back</button>
+      <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back to Menu</button>
       <p style={s.label}>Aftercare Guide</p>
       <h1 style={s.h1}>Care for Each Other</h1>
-      <p style={s.p}>Aftercare is the final, necessary part of any intimate session. It is not optional. Do this before sleeping.</p>
+      <p style={s.p}>Aftercare is a necessary part of the session. Do this before sleeping.</p>
+      
       <div style={s.safeBox}>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>Aftercare is for both of you — not only the person in the following role. Both of you may feel tender, tired, or emotionally raw. Both deserve tending.</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+          Aftercare is for <strong>both</strong> of you. Both may feel tender, tired, or emotionally raw.
+        </p>
       </div>
+
       <hr style={s.divider} />
+
       {aftercareItems.map(sec => (
-        <div key={sec.category} style={{ marginBottom: 20 }}>
+        <div key={sec.category} style={{ marginBottom: 24 }}>
           <span style={s.label}>{sec.category}</span>
           {sec.items.map(item => (
-            <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "9px 0", borderBottom: `1px solid ${C.rule}` }}>
-              <span style={{ color: C.accentLight, fontSize: 18, lineHeight: 1.3 }}>○</span>
-              <span style={{ color: C.softInk, fontSize: 14, lineHeight: 1.5 }}>{item}</span>
+            <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: `1px solid ${C.rule}` }}>
+              <span style={{ color: C.accentLight, fontSize: 18, lineHeight: 1.2 }}>○</span>
+              <span style={{ color: C.softInk, fontSize: 15, lineHeight: 1.5 }}>{item}</span>
             </div>
           ))}
         </div>
       ))}
+
+      <BreathingTool C={C} s={s} />
     </div>
   );
 
   if (view === "debrief") return (
     <div style={s.page}>
-      <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back</button>
+      <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), marginBottom: 20, fontSize: 13 }}>← Back to Menu</button>
       <p style={s.label}>Morning Debrief</p>
-      <h1 style={s.h1}>The Next Morning</h1>
-      <p style={s.p}>Find a quiet moment — not immediately on waking. Either of you can pass on any question.</p>
-      <div style={{ ...s.card, background: C.faithBg, border: `1px solid #c4aadd`, marginBottom: 20 }}>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>
-          If either of you feels sad, flat, or uneasy today — that may be a normal hormonal drop (see the Learn tab). But if unease persists, take it seriously and talk, or consider speaking to a counsellor.
-        </p>
-      </div>
+      <h1 style={s.h1}>Reflection</h1>
+      <p style={s.p}>Find a quiet, neutral moment today to check in honestly.</p>
+
       {debriefQuestions.map((item, i) => (
-        <div key={i} style={{ ...s.card, marginBottom: 10 }}>
-          <p style={{ fontFamily: font.serif, fontSize: 17, color: C.ink, marginBottom: 4, fontStyle: "italic" }}>
+        <div key={i} style={{ ...s.card, marginBottom: 12 }}>
+          <p style={{ fontFamily: font.serif, fontSize: 18, color: C.ink, marginBottom: 6, fontStyle: "italic" }}>
             "{item.q}"
           </p>
-          {item.note && <p style={{ ...s.p, fontSize: 12, color: C.muted, marginBottom: 8 }}>{item.note}</p>}
+          {item.note && <p style={{ ...s.p, fontSize: 12, color: C.muted, marginBottom: 10 }}>{item.note}</p>}
           <textarea
             style={s.input}
             rows={2}
-            placeholder="Write your thoughts..."
+            placeholder="Your thoughts..."
             value={answers[i] || ""}
             onChange={e => setAnswers(p => ({ ...p, [i]: e.target.value }))}
           />
         </div>
       ))}
+
+      <div style={s.card}>
+        <span style={s.label}>Private Notes (Local Only)</span>
+        {!revealNotes ? (
+          <button onClick={() => setRevealNotes(true)} style={{ ...s.btn("outline"), width: "100%", marginTop: 8 }}>
+            Reveal Saved Notes
+          </button>
+        ) : (
+          <>
+            <textarea
+              style={s.input}
+              rows={4}
+              placeholder="Any other private reflections..."
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+            />
+            <button onClick={() => setRevealNotes(false)} style={{ ...s.btn("outline"), width: "100%", fontSize: 12 }}>
+              Hide Notes
+            </button>
+          </>
+        )}
+      </div>
+
       <div style={s.safeBox}>
         <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
-          If the debrief surfaces anything uncomfortable or unresolved, that's important information. Slow down, have more conversation, and consider whether a kink-aware couples therapist would be a helpful next step.
+          If any session leaves you feeling uneasy, flat, or disconnected, take it seriously. Slow down and consider professional support.
         </p>
       </div>
     </div>
@@ -89,57 +117,42 @@ export default function ReflectTab({ C, s }) {
 
   return (
     <div style={s.page}>
-      <p style={s.label}>Aftercare &amp; Integration</p>
+      <p style={s.label}>Step 5</p>
       <h1 style={s.h1}>Reflect</h1>
-      <p style={s.p}>The session isn't over until you've cared for each other and checked in honestly.</p>
-
-      <BreathingTool C={C} s={s} />
+      <p style={s.p}>Integration and care are what make this sustainable and healthy.</p>
 
       <hr style={s.divider} />
+
       <button onClick={() => setView("aftercare")} style={{
-        ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`, display: "block", marginBottom: 12,
+        ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`, 
+        display: "block", marginBottom: 16
       }}>
-        <span style={s.label}>Tonight</span>
-        <p style={{ fontFamily: font.serif, fontSize: 20, color: C.ink, marginBottom: 4 }}>Aftercare Guide</p>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>Physical and emotional care for both partners after any session.</p>
-      </button>
-      <button onClick={() => setView("debrief")} style={{
-        ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`, display: "block",
-      }}>
-        <span style={s.label}>Next Morning</span>
-        <p style={{ fontFamily: font.serif, fontSize: 20, color: C.ink, marginBottom: 4 }}>Morning Debrief</p>
-        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>Nine gentle questions to work through together the day after.</p>
+        <span style={s.label}>Immediate</span>
+        <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Aftercare Guide</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>Physical and emotional care immediately following a session.</p>
       </button>
 
-      <hr style={s.divider} />
-      <h2 style={{ ...s.h2, marginTop: 8 }}>Red Flags — Stop and Talk First</h2>
-      <p style={{ ...s.p, fontSize: 13 }}>If any of the following are true, pause all exploration and have more honest conversation — ideally with a professional.</p>
-      <div style={s.warnBox}>
-        <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 2, fontSize: 13 }}>
+      <button onClick={() => setView("debrief")} style={{
+        ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`, 
+        display: "block"
+      }}>
+        <span style={s.label}>Next Day</span>
+        <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Morning Debrief</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>Reflect on safety, trust, and how the session affected your connection.</p>
+      </button>
+
+      <div style={{ ...s.warnBox, marginTop: 24 }}>
+        <h3 style={{ ...s.label, color: C.warnBorder }}>Red Flags</h3>
+        <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 13, marginTop: 8 }}>
           {[
-            "Either person feels pressured, obligated, or says yes to keep the peace",
-            "Either person is afraid to say 'not tonight'",
-            "One partner is doing the persuading or returning to the subject repeatedly",
-            "Safewords are not fully respected when used",
-            "Either person is dissociating, shutting down, or becoming unreachable",
-            "Shame, secrecy, or conflict is increasing rather than decreasing",
-            "Either person feels more alone after intimacy than before",
+            "Pressure or obligation to continue",
+            "Fear of saying 'not tonight'",
+            "Safewords not being respected",
+            "Dissociating or shutting down during play",
+            "Feeling more alone after intimacy than before",
           ].map(f => <li key={f}>{f}</li>)}
         </ul>
       </div>
-
-      <hr style={s.divider} />
-      <button 
-        onClick={() => {
-          if (window.confirm("Are you sure you want to clear all app data? This cannot be undone.")) {
-            localStorage.clear();
-            window.location.reload();
-          }
-        }} 
-        style={{ ...s.btn("outline"), width: "100%", color: "#c44a3a", borderColor: "#c44a3a" }}
-      >
-        Clear All App Data
-      </button>
     </div>
   );
 }
