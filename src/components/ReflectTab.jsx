@@ -29,11 +29,14 @@ const redFlagChecks = [
   "I feel ashamed, more alone, or spiritually uneasy afterwards",
 ];
 
-export default function ReflectTab({ C, s }) {
+export default function ReflectTab({ C, s, onNavigate }) {
   const [view, setView] = useState(() => getLocal("reflect_view", "menu"));
   const [answers, setAnswers] = useState(() => getLocal("reflect_answers", {}));
   const [notes, setNotes] = useState(() => getLocal("reflect_notes", ""));
   const [flags, setFlags] = useState(() => getLocal("reflect_flags", {}));
+  const [aftercareChecked, setAftercareChecked] = useState(() => getLocal("reflect_aftercare_checked", {}));
+  const [history, setHistory] = useState(() => getLocal("reflect_history", []));
+  const [showHistory, setShowHistory] = useState(false);
   const [revealNotes, setRevealNotes] = useState(false);
 
   useEffect(() => {
@@ -41,7 +44,23 @@ export default function ReflectTab({ C, s }) {
     setLocal("reflect_answers", answers);
     setLocal("reflect_notes", notes);
     setLocal("reflect_flags", flags);
-  }, [view, answers, notes, flags]);
+    setLocal("reflect_aftercare_checked", aftercareChecked);
+    setLocal("reflect_history", history);
+  }, [view, answers, notes, flags, aftercareChecked, history]);
+
+  const copyDebrief = () => {
+    const text = debriefQuestions.map((item, i) => `${item.q}\n${answers[i] || ""}`).join("\n\n");
+    navigator.clipboard.writeText(text);
+  };
+
+  const saveDebrief = () => {
+    const entry = {
+      date: new Date().toLocaleString(),
+      answers,
+      flags,
+    };
+    setHistory(previous => [entry, ...previous].slice(0, 10));
+  };
 
   if (view === "aftercare") return (
     <div style={s.page}>
@@ -59,10 +78,10 @@ export default function ReflectTab({ C, s }) {
         <div key={sec.category} style={{ marginBottom: 24 }}>
           <span style={s.label}>{sec.category}</span>
           {sec.items.map(item => (
-            <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: `1px solid ${C.rule}` }}>
-              <span style={{ color: C.accentLight, fontSize: 18, lineHeight: 1.2 }}>o</span>
+            <button key={item} onClick={() => setAftercareChecked(prev => ({ ...prev, [item]: !prev[item] }))} style={{ width: "100%", background: "transparent", border: "none", display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: `1px solid ${C.rule}`, textAlign: "left" }}>
+              <span style={{ color: aftercareChecked[item] ? C.sage : C.accentLight, fontSize: 18, lineHeight: 1.2 }}>{aftercareChecked[item] ? "✓" : "o"}</span>
               <span style={{ color: C.softInk, fontSize: 15, lineHeight: 1.5 }}>{item}</span>
-            </div>
+            </button>
           ))}
         </div>
       ))}
@@ -112,6 +131,29 @@ export default function ReflectTab({ C, s }) {
           </p>
         </div>
       )}
+      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+        <button onClick={copyDebrief} style={{ ...s.btn("outline"), flex: 1 }}>Copy Debrief</button>
+        <button onClick={saveDebrief} style={{ ...s.btn(), flex: 1 }}>Save Debrief</button>
+      </div>
+      <div style={s.card}>
+        <button onClick={() => setShowHistory(!showHistory)} style={{ ...s.btn("outline"), width: "100%" }}>
+          {showHistory ? "Hide" : "Show"} Previous Debriefs
+        </button>
+        {showHistory && (
+          <div style={{ marginTop: 12 }}>
+            {history.slice(0, 3).length === 0 ? (
+              <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>No saved debriefs yet.</p>
+            ) : history.slice(0, 3).map((entry, index) => (
+              <div key={`${entry.date}-${index}`} style={{ borderTop: `1px solid ${C.rule}`, paddingTop: 10, marginTop: 10 }}>
+                <strong style={{ color: C.accent }}>{entry.date}</strong>
+                <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>
+                  {Object.values(entry.answers || {}).filter(Boolean).length} responses saved
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       <div style={s.card}>
         <span style={s.label}>Private Notes (Local Only)</span>
         {!revealNotes ? (
@@ -148,6 +190,9 @@ export default function ReflectTab({ C, s }) {
           {["Pressure or obligation to continue", "Fear of saying not tonight", "Safewords or Yellow not being respected", "Dissociating, fawning, freezing, or shutting down", "Feeling more alone after intimacy than before"].map(f => <li key={f}>{f}</li>)}
         </ul>
       </div>
+      <button onClick={() => onNavigate?.("resources")} style={{ ...s.btn("outline"), width: "100%", marginTop: 12 }}>
+        Need support or reading? Go to Resources
+      </button>
     </div>
   );
 }

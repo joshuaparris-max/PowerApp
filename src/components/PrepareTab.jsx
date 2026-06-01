@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 import { getLocal, setLocal } from "../utils/storage";
-import { beginnerActivities as baseActivities } from "../data/activities";
-
-const beginnerActivities = [
-  ...baseActivities,
-  { id: "roleplay_simple", label: "Simple roleplay" },
-  { id: "breathing_sync", label: "Synchronized breathing" },
-  { id: "reassurance", label: "Verbal reassurance" },
-  { id: "prayer", label: "Prayer/reflection" },
-];
-import { buildPlanText, getExcludedActivities, getMutualYesActivities } from "../utils/plan";
+import { beginnerActivities } from "../data/activities";
+import { buildPlanText, getExcludedActivities, getMutualYesFromStorage } from "../utils/plan";
 
 const preflightItems = [
   "We have both completed the conversation guide",
@@ -24,7 +16,9 @@ const preflightItems = [
   "We are not carrying unresolved conflict into this evening",
 ];
 
-export default function PrepareTab({ C, s }) {
+// Step 3: Prepare
+// LocalStorage keys: prepare_checked, tonight_plan
+export default function PrepareTab({ C, s, onNavigate }) {
   const [checked, setChecked] = useState(() => getLocal("prepare_checked", {}));
   const [plan, setPlan] = useState(() => getLocal("tonight_plan", {
     goal: "",
@@ -44,7 +38,7 @@ export default function PrepareTab({ C, s }) {
   const [showPlanBuilder, setShowPlanBuilder] = useState(false);
 
   const allChecked = preflightItems.every((_, i) => checked[i]);
-  const bothYes = beginner_activities_filter();
+  const bothYes = getMutualYesFromStorage(getLocal, beginnerActivities);
   const excluded = getExcludedActivities(getLocal("connect_partnerA", {}), getLocal("connect_partnerB", {}), beginnerActivities);
   const hasRiskFlag = plan.riskConflict || plan.riskSubstances || plan.riskPressure || plan.riskUnease;
 
@@ -55,12 +49,6 @@ export default function PrepareTab({ C, s }) {
   useEffect(() => {
     setLocal("tonight_plan", plan);
   }, [plan]);
-
-  function beginner_activities_filter() {
-    const partnerA = getLocal("connect_partnerA", {});
-    const partnerB = getLocal("connect_partnerB", {});
-    return getMutualYesActivities(partnerA, partnerB, beginnerActivities);
-  }
 
   const toggleCheck = (i) => setChecked(p => ({ ...p, [i]: !p[i] }));
 
@@ -320,6 +308,9 @@ export default function PrepareTab({ C, s }) {
           "Preparation is an act of care. It shows you value your partner's safety as much as your own."
         </p>
       </div>
+      <button onClick={() => onNavigate?.("session")} style={{ ...s.btn(), width: "100%", marginTop: 12 }}>
+        Ready to keep safety visible? Go to Session
+      </button>
     </div>
   );
 }

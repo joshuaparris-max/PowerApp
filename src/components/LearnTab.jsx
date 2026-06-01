@@ -3,12 +3,19 @@ import { font } from "../constants";
 import { Icon } from "./Icon";
 import SafetyQuiz from "./SafetyQuiz";
 import Glossary from "./Glossary";
+import StepProgress from "./StepProgress";
 import { getLocal, setLocal, removeLocal } from "../utils/storage";
 
-export default function LearnTab({ C, s }) {
+/**
+ * Step 1: Learn
+ * Educational foundation for BDSM safety.
+ * LocalStorage keys: learn_open, learn_confidence, learn_reflection, learn_read
+ */
+export default function LearnTab({ C, s, onNavigate }) {
   const [open, setOpen] = useState(() => getLocal("learn_open", null));
   const [confidence, setConfidence] = useState(() => getLocal("learn_confidence", {}));
   const [reflection, setReflection] = useState(() => getLocal("learn_reflection", {}));
+  const [readSections, setReadSections] = useState(() => getLocal("learn_read", {}));
 
   useEffect(() => {
     if (open) {
@@ -21,7 +28,8 @@ export default function LearnTab({ C, s }) {
   useEffect(() => {
     setLocal("learn_confidence", confidence);
     setLocal("learn_reflection", reflection);
-  }, [confidence, reflection]);
+    setLocal("learn_read", readSections);
+  }, [confidence, reflection, readSections]);
 
   const handleConfidence = (id, level) => {
     setConfidence(prev => ({ ...prev, [id]: level }));
@@ -30,6 +38,8 @@ export default function LearnTab({ C, s }) {
   const handleReflection = (id, text) => {
     setReflection(prev => ({ ...prev, [id]: text }));
   };
+
+  const markRead = (id) => setReadSections(prev => ({ ...prev, [id]: !prev[id] }));
 
   const learnSections = [
     {
@@ -138,27 +148,9 @@ export default function LearnTab({ C, s }) {
       ),
     },
     {
-      id: "marriage_consent",
-      title: "Marriage Never Replaces Consent",
-      content: (
-        <div>
-          <div style={s.warnBox}>
-            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
-              Being married does not create automatic permission. Consent still needs to be freely given, reversible, informed, enthusiastic, and specific.
-            </p>
-          </div>
-          <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
-            <li>Silence, freezing, going quiet, not resisting, or avoiding conflict are not consent.</li>
-            <li>"I said yes once" does not mean ongoing permission.</li>
-            <li>"Maybe" means "not tonight" unless it becomes a clear mutual Yes later.</li>
-            <li>Either spouse can stop, change course, or say "not tonight" without sulking, argument, or persuasion.</li>
-          </ul>
-        </div>
-      )
-    },
-    {
       id: "safewords_not_magic",
       title: "Safewords Are Not Magic",
+      reflect: "In your own words, what would 'Red' mean for us in practice?",
       content: (
         <div>
           <p style={s.p}>Safewords only work when both people are trustworthy, sober, attentive, and immediately willing to stop.</p>
@@ -168,26 +160,6 @@ export default function LearnTab({ C, s }) {
             </p>
           </div>
           <p style={s.p}>The real safety system is character: warmth, patience, self-control, and care for the slower partner.</p>
-        </div>
-      )
-    },
-    {
-      id: "nervous_system",
-      title: "Emotional & Nervous System Safety",
-      content: (
-        <div>
-          <p style={s.p}>Kink can touch vulnerability, shame, fear, rejection sensitivity, and old protective responses. These signs mean pause or stop warmly.</p>
-          <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
-            <li><strong>Freeze:</strong> going still, quiet, blank, or unable to choose.</li>
-            <li><strong>Fawn:</strong> people-pleasing to avoid disappointing the other person.</li>
-            <li><strong>Dissociation:</strong> feeling far away, unreal, floaty, or disconnected.</li>
-            <li><strong>Shutdown:</strong> becoming unreachable, numb, or unable to communicate clearly.</li>
-          </ul>
-          <div style={s.safeBox}>
-            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
-              Stop warmly: "You are safe. We are stopping. Nothing is wrong with you. What do you need right now?"
-            </p>
-          </div>
         </div>
       )
     },
@@ -440,12 +412,22 @@ export default function LearnTab({ C, s }) {
       ),
     },
   ];
+  const readCount = learnSections.filter(section => readSections[section.id]).length;
 
   return (
     <div style={s.page}>
-      <p style={s.label}>Step 1</p>
+      <StepProgress activeStep="learn" C={C} s={s} />
       <h1 style={s.h1}>Learn</h1>
       <p style={s.p}>Read these sections together fully clothed. Knowledge is the foundation of safety.</p>
+      <div style={s.safeBox}>
+        <span style={{ ...s.label, color: C.sage }}>Start Here</span>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 8 }}>
+          Suggested order: definitions, consent in marriage, safewords, healthy dynamics, nervous-system safety, then limits.
+        </p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+          Sections read: {readCount}/{learnSections.length}
+        </p>
+      </div>
       
       <div className="wide-card-grid">
         <SafetyQuiz C={C} s={s} />
@@ -466,7 +448,7 @@ export default function LearnTab({ C, s }) {
               fontFamily: font.serif, fontSize: 18,
               color: open === sec.id ? C.cream : C.ink, transition: "all 0.2s",
             }}>
-            {sec.title}
+            <span>{readSections[sec.id] ? "✓ " : ""}{sec.title}</span>
             <span style={{ color: open === sec.id ? C.accentLight : C.muted, display: "flex", alignItems: "center" }}>
               <Icon name="chevron" open={open === sec.id} />
             </span>
@@ -516,6 +498,9 @@ export default function LearnTab({ C, s }) {
                     </p>
                   </div>
                 )}
+                <button onClick={() => markRead(sec.id)} style={{ ...s.btn(readSections[sec.id] ? "primary" : "outline"), width: "100%", marginTop: 12 }}>
+                  {readSections[sec.id] ? "Marked as read" : "Mark this section as read"}
+                </button>
               </div>
             </div>
           )}
@@ -527,6 +512,12 @@ export default function LearnTab({ C, s }) {
           "Stopping is the safety system working. A conversation-only evening is a successful evening."
         </p>
       </div>
+      <button 
+        onClick={() => onNavigate?.("connect")} 
+        style={{ ...s.btn(), width: "100%", marginTop: 24, padding: "16px" }}
+      >
+        Ready? → Go to Connect
+      </button>
     </div>
   );
 }

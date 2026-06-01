@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { font } from "../constants";
 import { clearAllLocal, removeLocal } from "../utils/storage";
 
+// Privacy and data management.
+// Clears localStorage keys used by worksheets, plans, debriefs, or the whole app.
 export default function PrivacyTab({ C, s }) {
   const [confirmClear, setConfirmClear] = useState(false);
 

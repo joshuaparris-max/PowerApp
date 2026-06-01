@@ -4,6 +4,9 @@ import { getLocal, setLocal } from "../utils/storage";
 import { beginnerActivities, voteOptions } from "../data/activities";
 import { getMutualYesActivities } from "../utils/plan";
 
+// ConnectTab stores conversation position, Partner A/B worksheet answers, and hard limits in localStorage.
+// It gathers motive-first conversation data and only reveals mutual Yes activities for planning.
+
 const conversationCards = [
     { prompt: "What am I curious about exploring together?", category: "Motive" },
     { prompt: "What scares me or makes me feel uncertain?", category: "Motive" },
@@ -19,35 +22,7 @@ const conversationCards = [
     { prompt: "If tonight ends with just a good conversation, how would you feel about that?", category: "Expectations" },
 ];
 
-const beginner_activities = [
-  // Atmosphere & Tone
-  { id: "tone", label: "Tone of voice changes, playful instruction", category: "Atmosphere & Tone" },
-  { id: "lead", label: "One partner chooses music, lighting, and pace", category: "Atmosphere & Tone" },
-  // Sensory & Sensation
-  { id: "massage", label: "Massage with intentional, unhurried attention", category: "Sensory & Sensation" },
-  { id: "blindfold", label: "Blindfold (sleep mask) to heighten other senses", category: "Sensory & Sensation" },
-  { id: "light_touch", label: "Light sensation — soft fabric, fingertips", category: "Sensory & Sensation" },
-  { id: "temp", label: "Temperature play — ice cube or warm touch, gently", category: "Sensory & Sensation" },
-  // Gentle Restraint
-  { id: "hold", label: "Hands gently held (no binding)", category: "Gentle Restraint" },
-  { id: "scarf", label: "Soft wrist tie with a scarf (easy-release only)", category: "Gentle Restraint" },
-  { id: "stillness", label: "Agreed request to 'stay still' without binding", category: "Gentle Restraint" },
-  // Power & Direction
-  { id: "initiative", label: "One person takes clear initiative for the encounter", category: "Power & Direction" },
-  { id: "permission", label: "Asking permission before actions", category: "Power & Direction" },
-  { id: "instructions", label: "Giving and receiving gentle instructions", category: "Power & Direction" },
-  // Language & Words
-  { id: "words", label: "Agreed words of endearment or roles during intimacy", category: "Language & Words" },
-  // Roleplay
-  { id: "roleplay_simple", label: "Very simple character or 'first meeting' roleplay", category: "Roleplay" },
-  // Care & Aftercare
-  { id: "breathing_sync", label: "Slow, synchronized breathing after session", category: "Care & Aftercare" },
-  { id: "reassurance", label: "Verbal reassurance: 'I love you, you are safe'", category: "Care & Aftercare" },
-  // Faith/Conscience
-  { id: "prayer", label: "Quiet prayer or reflection together after session", category: "Faith/Conscience" },
-];
-
-export default function ConnectTab({ C, s }) {
+export default function ConnectTab({ C, s, onNavigate }) {
   const [view, setView] = useState(() => getLocal("connect_view", "menu"));
   const [cardIdx, setCardIdx] = useState(() => getLocal("connect_cardIdx", 0));
   const [partnerA, setPartnerA] = useState(() => getLocal("connect_partnerA", {}));
@@ -302,6 +277,10 @@ export default function ConnectTab({ C, s }) {
           "Stopping after a good conversation is a complete and successful evening."
         </p>
       </div>
+      <button onClick={() => onNavigate?.("prepare")} style={{ ...s.btn(), width: "100%", marginTop: 12 }}>
+        Ready? Go to Prepare
+      </button>
     </div>
   );
 }
+

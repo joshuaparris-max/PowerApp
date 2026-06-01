@@ -53,36 +53,43 @@ const resources = {
   international: [
     {
       name: "The New Topping Book / New Bottoming Book",
+      level: "Beginner",
       desc: "Widely considered the 'gold standard' for beginner education on ethical power exchange and roles.",
       link: "https://www.goodreads.com/book/show/230114.The_New_Topping_Book"
     },
     {
       name: "FetLife Community Guides",
+      level: "Mixed",
       desc: "Adult community site. Some content is useful, some is not. Filter through consent, conscience, and mutual respect.",
       link: "https://fetlife.com/guides"
     },
     {
       name: "Scarleteen",
+      level: "Beginner",
       desc: "Consent-centred education with useful boundary and communication concepts.",
       link: "https://www.scarleteen.com"
     },
     {
       name: "National Coalition for Sexual Freedom",
+      level: "Beginner",
       desc: "Consent, legal, and kink-aware professional resources.",
       link: "https://ncsfreedom.org"
     },
     {
       name: "SM 101",
+      level: "Advanced",
       desc: "A safety-focused beginner book. Use cautiously and keep advanced material off the table.",
       link: "https://www.goodreads.com/book/show/208357.SM_101"
     },
     {
       name: "Different Loving / The Loving Dominant",
+      level: "Advanced",
       desc: "Books often recommended for adults learning about power exchange and communication.",
       link: "https://www.goodreads.com"
     },
     {
       name: "AASECT Therapist Directory",
+      level: "Directory",
       desc: "Directory for qualified sex therapists. Look for someone aligned with your values and relationship goals.",
       link: "https://www.aasect.org/referral-directory"
     },
@@ -100,12 +107,15 @@ const resources = {
     },
     {
       name: "Kink Aware Professionals (KAP)",
+      level: "Directory",
       desc: "Global directory of therapeutic and legal professionals.",
       link: "https://www.kapprofessionals.org"
     }
   ]
 };
 
+// External support and learning resources.
+// No user data is stored by this component.
 export default function ResourceDirectory({ C, s }) {
   const [region, setRegion] = React.useState("australia");
 
@@ -139,12 +149,14 @@ export default function ResourceDirectory({ C, s }) {
       <div style={s.warnBox}>
         <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>
           <strong>Important:</strong> These are external resources. This app is educational and not a substitute for counselling or medical advice.
+          {region === "international" ? " AASECT and KAP are primarily US-based and may have limited Australian coverage." : ""}
         </p>
       </div>
 
       {resources[region].map((res, i) => (
         <div key={i} style={{ ...s.card, marginBottom: 12 }}>
           <h3 style={{ fontFamily: font.serif, fontSize: 19, color: C.accent, marginBottom: 6 }}>{res.name}</h3>
+          {res.level && <span style={s.pill(res.level === "Advanced" ? C.warnBorder : C.sage, res.level === "Advanced" ? C.warnBg : C.sageBg)}>{res.level}</span>}
           <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>{res.desc}</p>
           {res.phone && (
             <p style={{ ...s.p, fontSize: 14, fontWeight: 700, marginBottom: 10, color: C.ink }}>

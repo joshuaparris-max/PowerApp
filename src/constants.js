@@ -200,6 +200,19 @@ export const getStyles = (C) => ({
     borderTop: `1px solid ${C.rule}`,
     margin: "24px 0",
   },
+  stepProgress: {
+    display: "flex",
+    gap: 4,
+    marginBottom: 24,
+    justifyContent: "center",
+  },
+  stepDot: (active, completed) => ({
+    width: 32,
+    height: 6,
+    borderRadius: 3,
+    background: active ? C.accent : completed ? C.sage : C.rule,
+    transition: "all 0.3s",
+  }),
 });
 
 export const C = themes.light;

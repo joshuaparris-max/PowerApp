@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { font } from "../constants";
 import BreathingTool from "./BreathingTool";
+import { getLocal, setLocal } from "../utils/storage";
 
 const checkInPrompts = [
   "How are you feeling right now?",
@@ -18,15 +19,41 @@ const groundingPrompts = [
   "What do you need right now? (Water, warmth, quiet, closeness?)"
 ];
 
-export default function SessionTab({ C, s }) {
+// Step 4: Session Safety
+// LocalStorage keys: session_seconds
+export default function SessionTab({ C, s, onNavigate }) {
   const [showGrounding, setShowGrounding] = useState(false);
   const [ended, setEnded] = useState(false);
+  const [showCheckIn, setShowCheckIn] = useState(false);
+  const [seconds, setSeconds] = useState(() => getLocal("session_seconds", 0));
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    setLocal("session_seconds", seconds);
+  }, [seconds]);
+
+  useEffect(() => {
+    if (!running) return undefined;
+    const timer = window.setInterval(() => setSeconds(value => value + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, [running]);
+
+  const time = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
   return (
     <div style={s.page}>
       <p style={s.label}>Step 4</p>
       <h1 style={s.h1}>Session Safety</h1>
       <p style={s.p}>Keep this screen visible. Either partner can call a signal at any moment.</p>
+
+      <div style={s.card}>
+        <span style={s.label}>Session Timer</span>
+        <p style={{ fontFamily: font.serif, fontSize: 36, color: C.ink, margin: "0 0 12px" }}>{time}</p>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setRunning(!running)} style={{ ...s.btn(), flex: 1 }}>{running ? "Pause" : "Start"}</button>
+          <button onClick={() => { setRunning(false); setSeconds(0); }} style={{ ...s.btn("outline"), flex: 1 }}>Reset</button>
+        </div>
+      </div>
 
       {/* Traffic Light Dashboard */}
       <div style={{ marginBottom: 24 }}>
@@ -54,7 +81,7 @@ export default function SessionTab({ C, s }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: 10, marginBottom: 24 }}>
         <button 
-          onClick={() => alert("Check-in requested. Slow down and talk.")}
+          onClick={() => setShowCheckIn(true)}
           style={{ ...s.btn(), background: "#c4a010", borderColor: "#c4a010" }}
         >
           Check colour now
@@ -72,18 +99,34 @@ export default function SessionTab({ C, s }) {
           End session now
         </button>
         <button
-          onClick={() => alert("Move to aftercare: water, warmth, reassurance, quiet, and no immediate analysis.")}
+          onClick={() => onNavigate?.("reflect")}
           style={{ ...s.btn("outline"), color: C.sage, borderColor: C.sage }}
         >
           Move to aftercare
         </button>
       </div>
 
+      {showCheckIn && (
+        <div style={s.safeBox}>
+          <span style={{ ...s.label, color: C.sage }}>Check colour now</span>
+          <p style={{ ...s.p, fontSize: 14, marginBottom: 8 }}>Ask each other: Green, Yellow, or Red?</p>
+          <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+            <li>Green: comfortable, present, and willing.</li>
+            <li>Yellow: pause, slow down, change course, or stop.</li>
+            <li>Red: stop immediately and move to care.</li>
+          </ul>
+          <button onClick={() => setShowCheckIn(false)} style={{ ...s.btn("outline"), width: "100%" }}>Close check-in</button>
+        </div>
+      )}
+
       {ended && (
         <div style={s.safeBox}>
           <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
             Session ended. This is a successful safety outcome. Move to aftercare: water, warmth, reassurance, and gentle closeness if wanted.
           </p>
+          <button onClick={() => { setEnded(false); onNavigate?.("reflect"); }} style={{ ...s.btn(), width: "100%", marginTop: 12 }}>
+            End Session and Go to Reflect
+          </button>
         </div>
       )}
 

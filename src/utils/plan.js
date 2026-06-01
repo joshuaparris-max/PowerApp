@@ -17,6 +17,14 @@ export function getExcludedActivities(partnerA = {}, partnerB = {}, activities =
   return activities.filter(activity => !getMutualYesActivities(partnerA, partnerB, [activity]).length);
 }
 
+export function getMutualYesFromStorage(getLocal, activities = beginnerActivities) {
+  return getMutualYesActivities(
+    getLocal("connect_partnerA", {}),
+    getLocal("connect_partnerB", {}),
+    activities
+  );
+}
+
 export function buildPlanText(plan = {}, mutualActivities = []) {
   return [
     "POWERAPP TONIGHT PLAN",

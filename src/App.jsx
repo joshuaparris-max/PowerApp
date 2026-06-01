@@ -9,6 +9,7 @@ import ReflectTab from "./components/ReflectTab";
 import ResourceDirectory from "./components/ResourceDirectory";
 import PrivacyTab from "./components/PrivacyTab";
 import Onboarding from "./components/Onboarding";
+import FlowProgress from "./components/FlowProgress";
 import { getLocal, setLocal } from "./utils/storage";
 
 const tabs = [
@@ -170,6 +171,15 @@ export default function App() {
           }
         }
 
+        @media (max-width: 400px) {
+          .main-nav .nav-label {
+            display: none;
+          }
+          .main-nav button {
+            padding: 14px 4px !important;
+          }
+        }
+
         @media (min-width: 1120px) {
           .content-scroll .wide-card-grid {
             display: grid;
@@ -239,7 +249,12 @@ export default function App() {
               Search the app... Ctrl/Cmd + K
             </button>
           </div>
-          <ActiveComponent C={C} s={s} />
+          {["learn", "connect", "prepare", "session", "reflect"].includes(activeTab) && (
+            <div style={{ maxWidth: 1180, margin: "24px auto 0", padding: "0 clamp(20px, 5vw, 72px)" }}>
+              <FlowProgress C={C} active={activeTab} />
+            </div>
+          )}
+          <ActiveComponent C={C} s={s} onNavigate={setActiveTab} />
         </div>
 
         {showSearch && (
@@ -269,7 +284,7 @@ export default function App() {
               aria-current={activeTab === tab.id ? "page" : undefined}
             >
               <Icon name={tab.icon} size={20} />
-              <span style={{ fontSize: 8, fontWeight: activeTab === tab.id ? 700 : 400, marginTop: 2 }}>{tab.label}</span>
+              <span className="nav-label" style={{ fontSize: 8, fontWeight: activeTab === tab.id ? 700 : 400, marginTop: 2 }}>{tab.label}</span>
             </button>
           ))}
         </nav>
