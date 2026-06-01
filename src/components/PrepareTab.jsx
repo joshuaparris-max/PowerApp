@@ -171,6 +171,30 @@ Stop Conditions: ${plan.stopConditions || "Not set"}`;
 
       <div style={s.card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <span style={s.label}>Suggested First Night Guide</span>
+          <span style={s.pill(C.accent, C.warmWhite)}>90 Minutes</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {[
+            { time: "15 min", title: "Connection", desc: "Calm conversation and prayer/check-in. Kids are asleep, phones are away." },
+            { time: "20 min", title: "Negotiation", desc: "Compare Yes/No/Maybe lists and agree on what sounds fun tonight." },
+            { time: "10 min", title: "Safety Setup", desc: "Confirm safewords, non-verbal signals, and aftercare plan." },
+            { time: "20-30 min", title: "Exploration", desc: "Very mild, mutually agreed activities only. Stay in the 'Yes' zone." },
+            { time: "15 min", title: "Aftercare", desc: "Immediate care, reassurance, and synchronized breathing." }
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <span style={{ fontFamily: font.sans, fontWeight: 700, fontSize: 12, color: C.accent, minWidth: 50 }}>{item.time}</span>
+              <div>
+                <p style={{ ...s.p, fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{item.title}</p>
+                <p style={{ ...s.p, fontSize: 13, marginBottom: 0, opacity: 0.8 }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={s.card}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <span style={s.label}>Pre-Flight Checklist</span>
           <button onClick={() => setChecked({})} style={{ ...s.btn("outline"), padding: "4px 8px", fontSize: 11 }}>Reset</button>
         </div>

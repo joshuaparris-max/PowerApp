@@ -17,6 +17,31 @@ export default function LearnTab({ C, s }) {
 
   const learnSections = [
     {
+      id: "what_is_bdsm",
+      title: "What BDSM Actually Means",
+      content: (
+        <div>
+          <p style={s.p}>BDSM is an umbrella term for a variety of practices. It is not a single activity, but a customized language of trust between two people.</p>
+          {[
+            { name: "B/D", full: "Bondage & Discipline", desc: "Using physical restraints (bondage) or setting rules and tasks (discipline)." },
+            { name: "D/s", full: "Dominance & Submission", desc: "A consensual exchange of power where one partner leads and the other surrenders control." },
+            { name: "S/M", full: "Sadism & Masochism", desc: "Deriving pleasure from giving or receiving controlled physical sensation." },
+            { name: "Kink", full: "Alternative Intimacy", desc: "A broad term for unconventional erotic interests that fall outside 'vanilla' norms." }
+          ].map(item => (
+            <div key={item.name} style={{ ...s.card, marginBottom: 8 }}>
+              <span style={{ ...s.label, color: C.accent }}>{item.name} — {item.full}</span>
+              <p style={{ ...s.p, marginBottom: 0, fontSize: 14 }}>{item.desc}</p>
+            </div>
+          ))}
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+              <strong>BDSM is not abuse.</strong> The dividing line is whether an act is explicitly negotiated, mutually desired, and genuinely retractable at any moment.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
       id: "healthy",
       title: "Healthy vs. Unhealthy Dynamics",
       content: (
@@ -54,9 +79,10 @@ export default function LearnTab({ C, s }) {
       content: (
         <div>
           {[
-            { name: "SSC", full: "Safe, Sane, Consensual", desc: "Activities must be physically safe, approached with a clear mind, and fully agreed to by both people. The foundation for beginners.", tag: "Recommended for beginners" },
-            { name: "4Cs", full: "Caring, Communication, Consent, Caution", desc: "Places ongoing care for one another at the centre. Ask: 'Are we caring for each other through this?'", tag: "Excellent for couples" },
-            { name: "RACK", full: "Risk-Aware Consensual Kink", desc: "Acknowledges that some activities carry risk. Better suited to experienced practitioners who understand those specific risks.", tag: "Advanced" },
+            { name: "SSC", full: "Safe, Sane, Consensual", desc: "Activities must be physically safe, approached with a clear mind, and fully agreed to. The gold standard for beginners.", tag: "Recommended" },
+            { name: "4Cs", full: "Caring, Communication, Consent, Caution", desc: "Focuses on relationship quality and ongoing care. Pairs perfectly with SSC.", tag: "Excellent for Couples" },
+            { name: "RACK", full: "Risk-Aware Consensual Kink", desc: "Acknowledges that all activities carry some risk. Focuses on informed consent about those specific risks.", tag: "Advanced" },
+            { name: "PRICK", full: "Personal Responsibility, Informed Consensual Kink", desc: "Emphasizes each individual's responsibility to communicate their own limits clearly.", tag: "Personal Focus" }
           ].map(fw => (
             <div key={fw.name} style={{ ...s.card, marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
@@ -64,8 +90,7 @@ export default function LearnTab({ C, s }) {
                   <span style={{ fontFamily: font.serif, fontSize: 20, color: C.accent }}>{fw.name}</span>
                   <span style={{ fontSize: 12, color: C.muted, marginLeft: 8 }}>{fw.full}</span>
                 </div>
-                <span style={s.pill(fw.tag.includes("Rec") ? C.sage : fw.tag.includes("coup") ? C.accent : C.muted,
-                  fw.tag.includes("Rec") ? C.sageBg : fw.tag.includes("coup") ? "#f5ede0" : C.warnBg)}>
+                <span style={s.pill(C.accent, C.warmWhite)}>
                   {fw.tag}
                 </span>
               </div>
@@ -74,6 +99,71 @@ export default function LearnTab({ C, s }) {
           ))}
         </div>
       ),
+    },
+    {
+      id: "consent",
+      title: "Consent Foundations (FRIES)",
+      content: (
+        <div>
+          <p style={s.p}>A helpful way to remember the foundations of consent is the <strong>FRIES</strong> acronym:</p>
+          {[
+            ["Freely Given", "Consent is a choice made without pressure, manipulation, or influence of drugs/alcohol."],
+            ["Reversible", "Anyone can change their mind at any time, even if they've already started."],
+            ["Informed", "You can only consent to something if you have the full picture of what it involves."],
+            ["Enthusiastic", "Consent should be about doing things you WANT to do, not things you're expected to do."],
+            ["Specific", "Saying yes to one thing (like massage) is not a yes to everything else."]
+          ].map(([type, desc]) => (
+            <div key={type} style={{ ...s.card, marginBottom: 8 }}>
+              <span style={{ ...s.label }}>{type}</span>
+              <p style={{ ...s.p, marginBottom: 0, fontSize: 14 }}>{desc}</p>
+            </div>
+          ))}
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, marginBottom: 0, fontSize: 14 }}>
+              <strong>"I said yes once" does not mean ongoing permission.</strong> Consent is a continuous conversation, not a one-time checkbox.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "porn_vs_reality",
+      title: "Porn vs. Reality",
+      content: (
+        <div>
+          <p style={s.p}>Popular media and pornography are often poor teachers for healthy BDSM.</p>
+          <div style={s.warnBox}>
+            <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+              <li><strong>Media omits negotiation:</strong> In movies, everything happens spontaneously. In reality, safety requires talking first.</li>
+              <li><strong>Media ignores aftercare:</strong> Real scenes don't just end; they require emotional and physical care afterward.</li>
+              <li><strong>Porn is a performance:</strong> It is designed for the viewer, not for the mutual pleasure or safety of the participants.</li>
+              <li><strong>Risk is often hidden:</strong> Media rarely shows the safety checks or the technical skill required for certain acts.</li>
+            </ul>
+          </div>
+          <p style={s.p}>Your exploration should be built around <strong>your</strong> relationship, <strong>your</strong> trust, and <strong>your</strong> specific boundaries — not a script from a screen.</p>
+        </div>
+      )
+    },
+    {
+      id: "christian_reflection",
+      title: "Faith & Christian Reflection",
+      content: (
+        <div>
+          <p style={s.p}>For a Christian couple, the question is not just "is this allowed?" but "does this express mutual love and honor?"</p>
+          <div style={{ ...s.card, background: "#f5f0f8", border: "1px solid #8a6aaa" }}>
+            <span style={{ ...s.label, color: "#8a6aaa" }}>Biblical Principles</span>
+            <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+              <li><strong>Mutual Consent:</strong> 1 Corinthians 7 emphasizes reciprocal marital honor and "mutual consent."</li>
+              <li><strong>Gentleness & Self-Control:</strong> Galatians 5 names these as fruits of the Spirit. Any play should deepen these qualities.</li>
+              <li><strong>Honoring the Body:</strong> 1 Thessalonians 4 calls us to possess our own bodies in "holiness and honor."</li>
+              <li><strong>Freedom of Conscience:</strong> Romans 14 teaches that we should not violate our own conscience or lead our spouse to violate theirs.</li>
+            </ul>
+          </div>
+          <p style={{ ...s.p, marginTop: 12 }}>
+            If an experiment leaves either of you feeling used, spiritually muddy, or unable to pray with a clean conscience, that matters more than any "intensity." Trust the Spirit's leading in your marriage.
+          </p>
+        </div>
+      )
     },
     {
       id: "limits",
@@ -97,31 +187,6 @@ export default function LearnTab({ C, s }) {
                 "Anything copied directly from pornography",
               ].map(t => <li key={t}>{t}</li>)}
             </ul>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "consent",
-      title: "Consent Foundations",
-      content: (
-        <div>
-          {[
-            ["Affirmative", "A clear, active yes — not the absence of no. Silence is not consent."],
-            ["Enthusiastic", "Both people are genuinely looking forward to this. Hesitation is a 'no'."],
-            ["Ongoing", "Consent must stay present. A yes ten minutes ago is not a yes now."],
-            ["Specific", "Agreeing to X does not mean agreeing to Y. Each activity needs its own agreement."],
-            ["Revocable", "Consent can be withdrawn instantly, at any point, without consequence."],
-          ].map(([type, desc]) => (
-            <div key={type} style={{ ...s.card, marginBottom: 8 }}>
-              <span style={{ ...s.label }}>{type} Consent</span>
-              <p style={{ ...s.p, marginBottom: 0, fontSize: 14 }}>{desc}</p>
-            </div>
-          ))}
-          <div style={s.safeBox}>
-            <p style={{ ...s.p, marginBottom: 0, fontSize: 14 }}>
-              <strong>"I said yes once" does not mean ongoing permission.</strong> Check-ins are not interruptions; they are acts of care.
-            </p>
           </div>
         </div>
       ),
