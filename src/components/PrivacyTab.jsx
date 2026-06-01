@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { font } from "../constants";
-import { clearAllLocal } from "../utils/storage";
+import { clearAllLocal, removeLocal } from "../utils/storage";
 
 export default function PrivacyTab({ C, s }) {
   const [confirmClear, setConfirmClear] = useState(false);
@@ -8,6 +8,13 @@ export default function PrivacyTab({ C, s }) {
   const handlePanicClear = () => {
     if (confirm("This will instantly delete ALL saved data, notes, and plans. This cannot be undone. Proceed?")) {
       clearAllLocal();
+      window.location.reload();
+    }
+  };
+
+  const clearKeys = (keys, label) => {
+    if (confirm(`Clear ${label}? This cannot be undone.`)) {
+      keys.forEach(removeLocal);
       window.location.reload();
     }
   };
@@ -27,6 +34,8 @@ export default function PrivacyTab({ C, s }) {
           <li>Nothing is ever sent to a server.</li>
           <li>We have no access to your data.</li>
           <li>No tracking or analytics are used.</li>
+          <li>Anyone with access to this device and browser may see saved notes or plans.</li>
+          <li>Private/incognito windows may delete saved data automatically.</li>
         </ul>
       </div>
 
@@ -60,6 +69,24 @@ export default function PrivacyTab({ C, s }) {
           style={{ ...s.btn(), background: "#c44a3a", width: "100%", padding: "14px", marginBottom: 12 }}
         >
           Panic Clear: Delete All Data
+        </button>
+        <button
+          onClick={() => clearKeys(["connect_partnerA", "connect_partnerB", "connect_hardLimitA", "connect_hardLimitB"], "worksheet responses")}
+          style={{ ...s.btn("outline"), width: "100%", padding: "12px", marginBottom: 10 }}
+        >
+          Clear Worksheets
+        </button>
+        <button
+          onClick={() => clearKeys(["tonight_plan", "prepare_checked"], "tonight's plan")}
+          style={{ ...s.btn("outline"), width: "100%", padding: "12px", marginBottom: 10 }}
+        >
+          Clear Tonight Plan
+        </button>
+        <button
+          onClick={() => clearKeys(["reflect_answers", "reflect_notes", "reflect_flags"], "debrief answers")}
+          style={{ ...s.btn("outline"), width: "100%", padding: "12px", marginBottom: 10 }}
+        >
+          Clear Debrief Answers
         </button>
         
         <p style={{ ...s.p, fontSize: 12, textAlign: "center", color: C.muted, marginBottom: 0 }}>

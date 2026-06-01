@@ -15,8 +15,7 @@ export const getLocal = (key, fallback) => {
     }
     
     return item;
-  } catch (error) {
-    console.error(`Error reading localStorage key "${key}":`, error);
+  } catch {
     return fallback;
   }
 };
@@ -30,8 +29,8 @@ export const setLocal = (key, value) => {
   try {
     const valueToStore = typeof value === 'object' ? JSON.stringify(value) : value;
     localStorage.setItem(key, valueToStore);
-  } catch (error) {
-    console.error(`Error saving to localStorage key "${key}":`, error);
+  } catch {
+    // Ignore storage failures so private browsing restrictions do not crash the app.
   }
 };
 
@@ -42,8 +41,8 @@ export const setLocal = (key, value) => {
 export const removeLocal = (key) => {
   try {
     localStorage.removeItem(key);
-  } catch (error) {
-    console.error(`Error removing localStorage key "${key}":`, error);
+  } catch {
+    // Ignore storage failures so private browsing restrictions do not crash the app.
   }
 };
 
@@ -53,7 +52,7 @@ export const removeLocal = (key) => {
 export const clearAllLocal = () => {
   try {
     localStorage.clear();
-  } catch (error) {
-    console.error("Error clearing localStorage:", error);
+  } catch {
+    // Ignore storage failures so private browsing restrictions do not crash the app.
   }
 };

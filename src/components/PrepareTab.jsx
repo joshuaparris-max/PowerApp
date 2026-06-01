@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 import { getLocal, setLocal } from "../utils/storage";
+import { beginnerActivities as baseActivities } from "../data/activities";
+
+const beginnerActivities = [
+  ...baseActivities,
+  { id: "roleplay_simple", label: "Simple roleplay" },
+  { id: "breathing_sync", label: "Synchronized breathing" },
+  { id: "reassurance", label: "Verbal reassurance" },
+  { id: "prayer", label: "Prayer/reflection" },
+];
+import { buildPlanText, getExcludedActivities, getMutualYesActivities } from "../utils/plan";
 
 const preflightItems = [
   "We have both completed the conversation guide",
@@ -17,16 +27,26 @@ const preflightItems = [
 export default function PrepareTab({ C, s }) {
   const [checked, setChecked] = useState(() => getLocal("prepare_checked", {}));
   const [plan, setPlan] = useState(() => getLocal("tonight_plan", {
+    goal: "",
     safeword: "",
     nonVerbal: "",
     activities: [],
+    hardLimits: "",
+    softLimits: "",
     aftercare: "",
-    stopConditions: ""
+    stopConditions: "",
+    checkInTime: "",
+    riskConflict: false,
+    riskSubstances: false,
+    riskPressure: false,
+    riskUnease: false
   }));
   const [showPlanBuilder, setShowPlanBuilder] = useState(false);
 
   const allChecked = preflightItems.every((_, i) => checked[i]);
   const bothYes = beginner_activities_filter();
+  const excluded = getExcludedActivities(getLocal("connect_partnerA", {}), getLocal("connect_partnerB", {}), beginnerActivities);
+  const hasRiskFlag = plan.riskConflict || plan.riskSubstances || plan.riskPressure || plan.riskUnease;
 
   useEffect(() => {
     setLocal("prepare_checked", checked);
@@ -39,22 +59,7 @@ export default function PrepareTab({ C, s }) {
   function beginner_activities_filter() {
     const partnerA = getLocal("connect_partnerA", {});
     const partnerB = getLocal("connect_partnerB", {});
-    const activities = [
-      { id: "tone", label: "Tone of voice changes" },
-      { id: "lead", label: "One partner chooses music/lighting" },
-      { id: "words", label: "Agreed words of endearment" },
-      { id: "massage", label: "Massage" },
-      { id: "blindfold", label: "Blindfold" },
-      { id: "light_touch", label: "Light sensation" },
-      { id: "temp", label: "Temperature play" },
-      { id: "hold", label: "Hands gently held" },
-      { id: "scarf", label: "Soft wrist tie (scarf)" },
-      { id: "stillness", label: "Agreed stillness" },
-      { id: "initiative", label: "One person takes initiative" },
-      { id: "permission", label: "Asking permission" },
-      { id: "instructions", label: "Gentle instructions" },
-    ];
-    return activities.filter(a => partnerA[a.id] === "yes" && partnerB[a.id] === "yes");
+    return getMutualYesActivities(partnerA, partnerB, beginnerActivities);
   }
 
   const toggleCheck = (i) => setChecked(p => ({ ...p, [i]: !p[i] }));
@@ -67,15 +72,19 @@ export default function PrepareTab({ C, s }) {
   };
 
   const exportPlan = () => {
-    const text = `TONIGHT'S PLAN
-Activities: ${plan.activities.join(", ") || "None selected"}
-Safeword: ${plan.safeword || "Not set"}
-Non-Verbal: ${plan.nonVerbal || "Not set"}
-Aftercare: ${plan.aftercare || "Not set"}
-Stop Conditions: ${plan.stopConditions || "Not set"}`;
-    
+    const text = buildPlanText(plan, bothYes);
     navigator.clipboard.writeText(text);
     alert("Plan copied to clipboard!");
+  };
+
+  const exportTextFile = () => {
+    const blob = new Blob([buildPlanText(plan, bothYes)], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "powerapp-tonight-plan.txt";
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (showPlanBuilder) return (
@@ -84,6 +93,40 @@ Stop Conditions: ${plan.stopConditions || "Not set"}`;
       <p style={s.label}>Plan Builder</p>
       <h1 style={s.h1}>Tonight's Plan</h1>
       <p style={s.p}>Create a clear, shared plan based on your mutual agreements.</p>
+
+      <div style={s.card}>
+        <span style={s.label}>Tonight's shared goal</span>
+        <input
+          style={s.input}
+          placeholder="Connection, tenderness, honest conversation..."
+          value={plan.goal}
+          onChange={e => setPlan({ ...plan, goal: e.target.value })}
+        />
+      </div>
+
+      <div style={hasRiskFlag ? s.warnBox : s.safeBox}>
+        <span style={{ ...s.label, color: hasRiskFlag ? C.warnBorder : C.sage }}>Wisdom Check</span>
+        {[
+          ["riskConflict", "We are carrying unresolved conflict tonight"],
+          ["riskSubstances", "Alcohol, medication, or substances may affect consent"],
+          ["riskPressure", "Either person feels pressure, fear, or obligation"],
+          ["riskUnease", "Either person feels spiritual or conscience unease"],
+        ].map(([key, label]) => (
+          <label key={key} style={{ display: "flex", gap: 10, alignItems: "flex-start", color: C.softInk, fontSize: 14, marginTop: 8 }}>
+            <input
+              type="checkbox"
+              checked={Boolean(plan[key])}
+              onChange={e => setPlan({ ...plan, [key]: e.target.checked })}
+            />
+            <span>{label}</span>
+          </label>
+        ))}
+        {hasRiskFlag && (
+          <p style={{ ...s.p, fontSize: 14, marginTop: 12, marginBottom: 0 }}>
+            Tonight's wise choice is connection, rest, and no further exploration. Talk gently and return another day.
+          </p>
+        )}
+      </div>
 
       <div style={s.card}>
         <span style={s.label}>Mutual Yes Activities</span>
@@ -126,6 +169,24 @@ Stop Conditions: ${plan.stopConditions || "Not set"}`;
       </div>
 
       <div style={s.card}>
+        <span style={s.label}>Limits for tonight</span>
+        <textarea
+          style={s.input}
+          rows={2}
+          placeholder="Hard limits, copied from your conversation..."
+          value={plan.hardLimits}
+          onChange={e => setPlan({ ...plan, hardLimits: e.target.value })}
+        />
+        <textarea
+          style={s.input}
+          rows={2}
+          placeholder="Soft limits, Not Now, Maybe, or unanswered items excluded from tonight..."
+          value={plan.softLimits}
+          onChange={e => setPlan({ ...plan, softLimits: e.target.value })}
+        />
+      </div>
+
+      <div style={s.card}>
         <span style={s.label}>Aftercare Plan</span>
         <textarea 
           style={s.input} 
@@ -147,13 +208,36 @@ Stop Conditions: ${plan.stopConditions || "Not set"}`;
         />
       </div>
 
+      <div style={s.card}>
+        <span style={s.label}>Morning-after check-in time</span>
+        <input
+          style={s.input}
+          placeholder="Tomorrow after breakfast, 10 minutes..."
+          value={plan.checkInTime}
+          onChange={e => setPlan({ ...plan, checkInTime: e.target.value })}
+        />
+      </div>
+
+      <div style={s.warnBox}>
+        <span style={{ ...s.label, color: C.warnBorder }}>Excluded from tonight</span>
+        <p style={{ ...s.p, fontSize: 13, marginBottom: 8 }}>
+          These are not in the plan unless both partners later move them to a clear Yes.
+        </p>
+        <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>
+          {excluded.map(item => item.label).join(", ") || "Nothing to show yet."}
+        </p>
+      </div>
+
       <button onClick={exportPlan} style={{ ...s.btn(), width: "100%", marginBottom: 12 }}>
         Copy Plan to Clipboard
+      </button>
+      <button onClick={exportTextFile} style={{ ...s.btn("outline"), width: "100%", marginBottom: 12 }}>
+        Export Plan as .txt
       </button>
       <button 
         onClick={() => {
           if (confirm("Clear this plan?")) {
-            setPlan({ safeword: "", nonVerbal: "", activities: [], aftercare: "", stopConditions: "" });
+            setPlan({ goal: "", safeword: "", nonVerbal: "", activities: [], hardLimits: "", softLimits: "", aftercare: "", stopConditions: "", checkInTime: "", riskConflict: false, riskSubstances: false, riskPressure: false, riskUnease: false });
           }
         }} 
         style={{ ...s.btn("outline"), width: "100%", color: "#c44a3a", borderColor: "#c44a3a" }}
@@ -179,7 +263,7 @@ Stop Conditions: ${plan.stopConditions || "Not set"}`;
             { time: "15 min", title: "Connection", desc: "Calm conversation and prayer/check-in. Kids are asleep, phones are away." },
             { time: "20 min", title: "Negotiation", desc: "Compare Yes/No/Maybe lists and agree on what sounds fun tonight." },
             { time: "10 min", title: "Safety Setup", desc: "Confirm safewords, non-verbal signals, and aftercare plan." },
-            { time: "20-30 min", title: "Exploration", desc: "Very mild, mutually agreed activities only. Stay in the 'Yes' zone." },
+            { time: "20-30 min", title: "Only if still wise", desc: "Very mild, mutual Yes items only. Maybe, Not Now, No, and Hard Limits stay out." },
             { time: "15 min", title: "Aftercare", desc: "Immediate care, reassurance, and synchronized breathing." }
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -226,7 +310,7 @@ Stop Conditions: ${plan.stopConditions || "Not set"}`;
       ) : (
         <div style={s.warnBox}>
           <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
-            Complete the checklist above to unlock the Plan Builder. Safety first.
+            Talk through the checklist above before opening the Plan Builder. Safety first.
           </p>
         </div>
       )}

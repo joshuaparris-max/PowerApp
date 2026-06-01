@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { font } from "../constants";
+import BreathingTool from "./BreathingTool";
 
 const checkInPrompts = [
   "How are you feeling right now?",
@@ -19,6 +20,7 @@ const groundingPrompts = [
 
 export default function SessionTab({ C, s }) {
   const [showGrounding, setShowGrounding] = useState(false);
+  const [ended, setEnded] = useState(false);
 
   return (
     <div style={s.page}>
@@ -29,9 +31,9 @@ export default function SessionTab({ C, s }) {
       {/* Traffic Light Dashboard */}
       <div style={{ marginBottom: 24 }}>
         {[
-          { color: "#1a5c2a", bg: "#d4edda", border: "#5a8a4a", word: "GREEN", meaning: "Continue", sub: "All is well. We are both comfortable." },
-          { color: "#7a5500", bg: "#fff3cd", border: "#c4a010", word: "YELLOW", meaning: "Check In", sub: "Slow down. Pause, talk, and adjust." },
-          { color: "#7a1a1a", bg: "#f8d7da", border: "#c44a3a", word: "RED", meaning: "Stop Now", sub: "Stop immediately. No questions. Be warm." },
+          { color: "#1a5c2a", bg: "#d4edda", border: "#5a8a4a", word: "GREEN", meaning: "Continue", sub: "All is well. We are both comfortable, present, and enjoying this." },
+          { color: "#7a5500", bg: "#fff3cd", border: "#c4a010", word: "YELLOW", meaning: "Pause and check in", sub: "Slow down, reduce intensity, change course, or stop if either person wants. No justification needed." },
+          { color: "#7a1a1a", bg: "#f8d7da", border: "#c44a3a", word: "RED", meaning: "Stop now", sub: "Stop immediately, drop the role, offer warmth, no argument, no sulking, no persuasion, no justification needed." },
         ].map(sw => (
           <div key={sw.word} style={{ 
             background: sw.bg, 
@@ -50,24 +52,45 @@ export default function SessionTab({ C, s }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: 10, marginBottom: 24 }}>
         <button 
           onClick={() => alert("Check-in requested. Slow down and talk.")}
-          style={{ ...s.btn(), flex: 1, background: "#c4a010", borderColor: "#c4a010" }}
+          style={{ ...s.btn(), background: "#c4a010", borderColor: "#c4a010" }}
         >
-          Request Check-In
+          Check colour now
         </button>
         <button 
           onClick={() => setShowGrounding(!showGrounding)}
-          style={{ ...s.btn("outline"), flex: 1 }}
+          style={s.btn("outline")}
         >
-          {showGrounding ? "Hide Grounding" : "Grounding Tools"}
+          Pause and breathe
+        </button>
+        <button
+          onClick={() => setEnded(true)}
+          style={{ ...s.btn("outline"), color: "#c44a3a", borderColor: "#c44a3a" }}
+        >
+          End session now
+        </button>
+        <button
+          onClick={() => alert("Move to aftercare: water, warmth, reassurance, quiet, and no immediate analysis.")}
+          style={{ ...s.btn("outline"), color: C.sage, borderColor: C.sage }}
+        >
+          Move to aftercare
         </button>
       </div>
+
+      {ended && (
+        <div style={s.safeBox}>
+          <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+            Session ended. This is a successful safety outcome. Move to aftercare: water, warmth, reassurance, and gentle closeness if wanted.
+          </p>
+        </div>
+      )}
 
       {showGrounding && (
         <div style={{ ...s.card, background: C.faithBg, border: `1px solid ${C.accentLight}`, marginBottom: 24, animation: "fadeIn 0.2s ease-out" }}>
           <span style={s.label}>Grounding Prompts</span>
+          <BreathingTool C={C} s={s} />
           <p style={{ ...s.p, fontSize: 13, marginBottom: 12 }}>Use these if someone feels overwhelmed, floaty, or disconnected.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {groundingPrompts.map((p, i) => (

@@ -25,6 +25,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(() => getLocal("activeTab", "learn"));
   const [themeMode, setThemeMode] = useState(() => getLocal("themeMode", "light"));
   const [showOnboarding, setShowOnboarding] = useState(() => !getLocal("hasOnboarded", false));
+  const [showSearch, setShowSearch] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     setLocal("activeTab", activeTab);
@@ -34,20 +36,43 @@ export default function App() {
     setLocal("themeMode", themeMode);
   }, [themeMode]);
 
+  useEffect(() => {
+    const handler = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setShowSearch(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   const C = themes[themeMode];
   const s = getStyles(C);
 
   const ActiveComponent = tabs.find(t => t.id === activeTab)?.component || LearnTab;
+  const searchItems = [
+    ...tabs.map(tab => ({ tab: tab.id, title: tab.label, text: `${tab.label} section` })),
+    { tab: "learn", title: "Marriage never replaces consent", text: "consent silence freeze maybe not permission" },
+    { tab: "connect", title: "Yes No Maybe worksheet", text: "limits hard soft not now mutual yes" },
+    { tab: "prepare", title: "Tonight Plan Builder", text: "safeword non-verbal aftercare stop conditions" },
+    { tab: "session", title: "Traffic lights", text: "green yellow red pause stop warmth" },
+    { tab: "reflect", title: "Morning debrief", text: "aftercare pressure unsafe conscience red flag" },
+    { tab: "resources", title: "Australian support", text: "000 1800RESPECT Lifeline MensLine Consent.gov.au" },
+    { tab: "privacy", title: "Panic clear and local data", text: "localStorage clear worksheets plan debrief" },
+  ];
+  const results = searchItems.filter(item => `${item.title} ${item.text}`.toLowerCase().includes(search.toLowerCase())).slice(0, 8);
 
   const handlePanicClear = () => {
     if (confirm("Instantly delete all data? This cannot be undone.")) {
       localStorage.clear();
-      window.location.reload();
+      window.location.href = "about:blank";
     }
   };
 
-  const handleOnboardingComplete = () => {
+  const handleOnboardingComplete = (nextTab = "learn") => {
     setLocal("hasOnboarded", true);
+    setActiveTab(nextTab);
     setShowOnboarding(false);
   };
 
@@ -158,8 +183,30 @@ export default function App() {
 
         {/* Active tab */}
         <div key={activeTab} className="page-enter-active content-scroll">
+          <div style={{ maxWidth: 600, margin: "16px auto 0", padding: "0 24px" }}>
+            <button onClick={() => setShowSearch(true)} style={{ ...s.btn("outline"), width: "100%", textAlign: "left", color: C.muted }}>
+              Search the app... Ctrl/Cmd + K
+            </button>
+          </div>
           <ActiveComponent C={C} s={s} />
         </div>
+
+        {showSearch && (
+          <div role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 50, padding: 20 }}>
+            <div style={{ ...s.card, maxWidth: 560, margin: "8vh auto", background: C.warmWhite }}>
+              <label style={s.label} htmlFor="global-search">Global Search</label>
+              <input id="global-search" autoFocus style={s.input} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search consent, aftercare, privacy..." />
+              <div style={{ display: "grid", gap: 8 }}>
+                {results.map(item => (
+                  <button key={`${item.tab}-${item.title}`} onClick={() => { setActiveTab(item.tab); setShowSearch(false); setSearch(""); }} style={{ ...s.btn("outline"), textAlign: "left" }}>
+                    {item.title}
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setShowSearch(false)} style={{ ...s.btn(), width: "100%", marginTop: 12 }}>Close</button>
+            </div>
+          </div>
+        )}
 
         {/* Bottom Nav */}
         <nav style={s.nav} aria-label="Main navigation">

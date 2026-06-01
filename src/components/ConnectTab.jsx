@@ -1,35 +1,50 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 import { getLocal, setLocal } from "../utils/storage";
+import { beginnerActivities, voteOptions } from "../data/activities";
+import { getMutualYesActivities } from "../utils/plan";
 
 const conversationCards = [
-  { prompt: "What made you curious about exploring this together?", category: "Curiosity" },
-  { prompt: "What would you most like this to add to our relationship?", category: "Curiosity" },
-  { prompt: "What are you nervous or uncertain about?", category: "Fears" },
-  { prompt: "Is there anything you're afraid I might want that you wouldn't be comfortable with?", category: "Fears" },
-  { prompt: "What does 'feeling safe' look like for you during intimacy?", category: "Safety" },
-  { prompt: "What would make you feel free to stop at any moment?", category: "Safety" },
-  { prompt: "Are there past experiences or sensitivities we should protect against?", category: "History" },
-  { prompt: "How do your values or faith shape what feels loving — or not loving — here?", category: "Values" },
-  { prompt: "What is completely off the table for you — no exceptions?", category: "Limits" },
-  { prompt: "What would loving aftercare look like for you tonight?", category: "Aftercare" },
-  { prompt: "If tonight ends with just a good conversation, how would you feel about that?", category: "Expectations" },
+    { prompt: "What am I curious about exploring together?", category: "Motive" },
+    { prompt: "What scares me or makes me feel uncertain?", category: "Motive" },
+    { prompt: "What would make me feel pressured or unsafe?", category: "Safety" },
+    { prompt: "What would make me feel cherished and safe during and after?", category: "Motive" },
+    { prompt: "Is there anything I am agreeing to just to avoid disappointing you?", category: "Motive" },
+    { prompt: "How do our faith and values shape what feels loving here?", category: "Values" },
+    { prompt: "What does 'tenderness' look like for me?", category: "Motive" },
+    { prompt: "What would make you feel free to say 'not tonight' at any point?", category: "Safety" },
+    { prompt: "What would make this strengthen our marriage?", category: "Connection" },
+    { prompt: "What would make this harm our marriage?", category: "Connection" },
+    { prompt: "What would loving aftercare look like for you tonight?", category: "Aftercare" },
+    { prompt: "If tonight ends with just a good conversation, how would you feel about that?", category: "Expectations" },
 ];
 
 const beginner_activities = [
-  { id: "tone", label: "Tone of voice changes, playful instruction", category: "Atmosphere" },
-  { id: "lead", label: "One partner chooses music, lighting, and pace", category: "Atmosphere" },
-  { id: "words", label: "Agreed words of endearment during intimacy", category: "Atmosphere" },
-  { id: "massage", label: "Massage with intentional, unhurried attention", category: "Sensation" },
-  { id: "blindfold", label: "Blindfold (sleep mask) to heighten other senses", category: "Sensation" },
-  { id: "light_touch", label: "Light sensation — soft fabric, fingertips", category: "Sensation" },
-  { id: "temp", label: "Temperature play — ice cube or warm touch, gently", category: "Sensation" },
+  // Atmosphere & Tone
+  { id: "tone", label: "Tone of voice changes, playful instruction", category: "Atmosphere & Tone" },
+  { id: "lead", label: "One partner chooses music, lighting, and pace", category: "Atmosphere & Tone" },
+  // Sensory & Sensation
+  { id: "massage", label: "Massage with intentional, unhurried attention", category: "Sensory & Sensation" },
+  { id: "blindfold", label: "Blindfold (sleep mask) to heighten other senses", category: "Sensory & Sensation" },
+  { id: "light_touch", label: "Light sensation — soft fabric, fingertips", category: "Sensory & Sensation" },
+  { id: "temp", label: "Temperature play — ice cube or warm touch, gently", category: "Sensory & Sensation" },
+  // Gentle Restraint
   { id: "hold", label: "Hands gently held (no binding)", category: "Gentle Restraint" },
   { id: "scarf", label: "Soft wrist tie with a scarf (easy-release only)", category: "Gentle Restraint" },
   { id: "stillness", label: "Agreed request to 'stay still' without binding", category: "Gentle Restraint" },
-  { id: "initiative", label: "One person takes clear initiative for the encounter", category: "Power" },
-  { id: "permission", label: "Asking permission before actions", category: "Power" },
-  { id: "instructions", label: "Giving and receiving gentle instructions", category: "Power" },
+  // Power & Direction
+  { id: "initiative", label: "One person takes clear initiative for the encounter", category: "Power & Direction" },
+  { id: "permission", label: "Asking permission before actions", category: "Power & Direction" },
+  { id: "instructions", label: "Giving and receiving gentle instructions", category: "Power & Direction" },
+  // Language & Words
+  { id: "words", label: "Agreed words of endearment or roles during intimacy", category: "Language & Words" },
+  // Roleplay
+  { id: "roleplay_simple", label: "Very simple character or 'first meeting' roleplay", category: "Roleplay" },
+  // Care & Aftercare
+  { id: "breathing_sync", label: "Slow, synchronized breathing after session", category: "Care & Aftercare" },
+  { id: "reassurance", label: "Verbal reassurance: 'I love you, you are safe'", category: "Care & Aftercare" },
+  // Faith/Conscience
+  { id: "prayer", label: "Quiet prayer or reflection together after session", category: "Faith/Conscience" },
 ];
 
 export default function ConnectTab({ C, s }) {
@@ -54,8 +69,8 @@ export default function ConnectTab({ C, s }) {
   const votes = activePartner === "A" ? partnerA : partnerB;
   const setVotes = activePartner === "A" ? setPartnerA : setPartnerB;
 
-  const bothYes = beginner_activities.filter(a => partnerA[a.id] === "yes" && partnerB[a.id] === "yes");
-  const categories = [...new Set(beginner_activities.map(a => a.category))];
+  const bothYes = getMutualYesActivities(partnerA, partnerB, beginnerActivities);
+  const categories = [...new Set(beginnerActivities.map(a => a.category))];
 
   // Progress calculations
   const cardsCompleted = cardIdx + 1 === conversationCards.length;
@@ -81,7 +96,7 @@ export default function ConnectTab({ C, s }) {
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
         <button 
           onClick={() => setCardIdx(Math.max(0, cardIdx - 1))} 
           style={{ ...s.btn("outline"), flex: 1 }} 
@@ -93,6 +108,14 @@ export default function ConnectTab({ C, s }) {
           ? <button onClick={() => setCardIdx(cardIdx + 1)} style={{ ...s.btn(), flex: 1 }}>Next Card</button>
           : <button onClick={() => setView("menu")} style={{ ...s.btn(), flex: 1, background: C.sage }}>Finish Guide</button>
         }
+        <div style={{ width: "100%", display: "flex", gap: 12, marginTop: 8 }}>
+          <button onClick={() => setCardIdx(Math.min(conversationCards.length - 1, cardIdx + 1))} style={{ ...s.btn("outline"), flex: 1, fontSize: 13 }}>
+            Pass Question
+          </button>
+          <button onClick={() => setView("menu")} style={{ ...s.btn("outline"), flex: 1, fontSize: 13 }}>
+            Pause & Save
+          </button>
+        </div>
       </div>
 
       <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 24, flexWrap: "wrap" }}>
@@ -103,6 +126,12 @@ export default function ConnectTab({ C, s }) {
             transition: "all 0.2s"
           }} />
         ))}
+      </div>
+      
+      <div style={{ ...s.safeBox, marginTop: 24 }}>
+        <p style={{ ...s.p, fontSize: 12, marginBottom: 0, fontStyle: "italic" }}>
+          "Pausing or skipping a question is a safe and good choice. The slower partner sets the pace."
+        </p>
       </div>
     </div>
   );
@@ -120,7 +149,10 @@ export default function ConnectTab({ C, s }) {
               Each partner fills this in <strong>separately</strong>. Only activities where <strong>both</strong> mark Yes will appear on the safe list.
             </p>
             <p style={{ ...s.p, fontSize: 13, marginBottom: 0, opacity: 0.8 }}>
-              <strong>Important:</strong> "Maybe" is not permission. It means "I'm curious but need to talk more first."
+              <strong>Important:</strong> "Maybe" or "Not now" is not permission. It means "No" until it becomes a clear, enthusiastic "Yes" later.
+            </p>
+            <p style={{ ...s.p, fontSize: 13, marginBottom: 0, opacity: 0.8 }}>
+              <strong>Plan rule:</strong> Maybe, Not Now, No, Hard Limit, and unanswered items cannot enter tonight's plan.
             </p>
           </div>
 
@@ -142,25 +174,21 @@ export default function ConnectTab({ C, s }) {
           {categories.map(cat => (
             <div key={cat} style={{ marginBottom: 20 }}>
               <span style={{ ...s.label, color: C.accent }}>{cat}</span>
-              {beginner_activities.filter(a => a.category === cat).map(act => (
+              {beginnerActivities.filter(a => a.category === cat).map(act => (
                 <div key={act.id} style={{ ...s.card, padding: "16px", marginBottom: 8 }}>
                   <p style={{ ...s.p, fontSize: 15, marginBottom: 12 }}>{act.label}</p>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {["yes", "maybe", "no"].map(opt => (
-                      <button key={opt} onClick={() => setVotes({ ...votes, [act.id]: opt })} style={{
-                        flex: 1, padding: "8px 4px", borderRadius: 6, cursor: "pointer",
-                        fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {voteOptions.map(opt => (
+                      <button key={opt.id} onClick={() => setVotes({ ...votes, [act.id]: opt.id })} style={{
+                        flex: 1, padding: "8px 2px", borderRadius: 6, cursor: "pointer",
+                        fontSize: 10, fontWeight: 700, letterSpacing: 0.2, textTransform: "uppercase",
                         border: "1px solid",
-                        background: votes[act.id] === opt
-                          ? (opt === "yes" ? C.sage : opt === "maybe" ? "#c4a010" : "#c44a3a")
-                          : C.warmWhite,
-                        color: votes[act.id] === opt ? "white" : C.muted,
-                        borderColor: votes[act.id] === opt
-                          ? (opt === "yes" ? C.sage : opt === "maybe" ? "#c4a010" : "#c44a3a")
-                          : C.rule,
+                        background: votes[act.id] === opt.id ? (opt.id === "yes" ? C.sage : opt.id === "hard_limit" || opt.id === "no" ? "#c44a3a" : "#c4a010") : C.warmWhite,
+                        color: votes[act.id] === opt.id ? "white" : C.muted,
+                        borderColor: votes[act.id] === opt.id ? (opt.id === "yes" ? C.sage : opt.id === "hard_limit" || opt.id === "no" ? "#c44a3a" : "#c4a010") : C.rule,
                         transition: "all 0.2s"
                       }}>
-                        {opt}
+                        {opt.label}
                       </button>
                     ))}
                   </div>
@@ -171,10 +199,10 @@ export default function ConnectTab({ C, s }) {
 
           <hr style={s.divider} />
           <div style={{ marginBottom: 24 }}>
-            <span style={s.label}>Partner A — Hard Limits</span>
+            <span style={s.label}>Partner A — Hard Limits (Never)</span>
             <textarea style={s.input} rows={3} value={hardLimitA} onChange={e => setHardLimitA(e.target.value)}
               placeholder="List items that are completely off the table..." />
-            <span style={s.label}>Partner B — Hard Limits</span>
+            <span style={s.label}>Partner B — Hard Limits (Never)</span>
             <textarea style={s.input} rows={3} value={hardLimitB} onChange={e => setHardLimitB(e.target.value)}
               placeholder="List items that are completely off the table..." />
           </div>
@@ -201,7 +229,9 @@ export default function ConnectTab({ C, s }) {
                 </button>
               )}
             </div>
-            <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>Only activities where both partners marked Yes.</p>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>
+              Only activities where both partners marked Yes. Maybe is not permission; no persuasion; a conversation-only night is success.
+            </p>
             {bothYes.length === 0
               ? <p style={{ color: C.muted, fontSize: 14, fontStyle: "italic" }}>No mutual items yet. This is a great time for more conversation.</p>
               : bothYes.map(a => (
@@ -237,7 +267,7 @@ export default function ConnectTab({ C, s }) {
       
       <div style={{ ...s.warnBox }}>
         <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
-          <strong>Reminder:</strong> "Maybe" is a "No" until it becomes a clear "Yes" through safe, open conversation.
+          <strong>The slower partner sets the pace.</strong> Exploration should strengthen trust, never create pressure or fear.
         </p>
       </div>
 
@@ -252,7 +282,7 @@ export default function ConnectTab({ C, s }) {
           {cardsCompleted && <span style={{ color: C.sage, fontSize: 12, fontWeight: 700 }}>✓ Completed</span>}
         </div>
         <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Conversation Guide</p>
-        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>11 gentle prompts to explore your curiosity, fears, and expectations.</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>Motive-first prompts to explore your curiosity, values, and expectations.</p>
       </button>
 
       <button onClick={() => setView("worksheet")} style={{
@@ -263,13 +293,13 @@ export default function ConnectTab({ C, s }) {
           <span style={s.label}>Part 2</span>
           {worksheetCompleted && <span style={{ color: C.sage, fontSize: 12, fontWeight: 700 }}>✓ Completed</span>}
         </div>
-        <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Yes / No / Maybe Worksheet</p>
-        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>Compare your boundaries and build a mutual list of safe activities.</p>
+        <p style={{ fontFamily: font.serif, fontSize: 22, color: C.ink, marginBottom: 6 }}>Yes / No / Maybe / Not Now</p>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>Detailed categories to build a mutual list of safe activities.</p>
       </button>
 
       <div style={{ ...s.safeBox, marginTop: 24 }}>
         <p style={{ ...s.p, fontSize: 14, marginBottom: 0, fontStyle: "italic" }}>
-          "Success is defined by the quality of your connection, not the level of physical activity."
+          "Stopping after a good conversation is a complete and successful evening."
         </p>
       </div>
     </div>

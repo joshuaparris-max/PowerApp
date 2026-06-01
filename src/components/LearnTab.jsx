@@ -8,6 +8,7 @@ import { getLocal, setLocal, removeLocal } from "../utils/storage";
 export default function LearnTab({ C, s }) {
   const [open, setOpen] = useState(() => getLocal("learn_open", null));
   const [confidence, setConfidence] = useState(() => getLocal("learn_confidence", {}));
+  const [reflection, setReflection] = useState(() => getLocal("learn_reflection", {}));
 
   useEffect(() => {
     if (open) {
@@ -19,16 +20,22 @@ export default function LearnTab({ C, s }) {
 
   useEffect(() => {
     setLocal("learn_confidence", confidence);
-  }, [confidence]);
+    setLocal("learn_reflection", reflection);
+  }, [confidence, reflection]);
 
   const handleConfidence = (id, level) => {
     setConfidence(prev => ({ ...prev, [id]: level }));
+  };
+
+  const handleReflection = (id, text) => {
+    setReflection(prev => ({ ...prev, [id]: text }));
   };
 
   const learnSections = [
     {
       id: "what_is_bdsm",
       title: "What BDSM Actually Means",
+      reflect: "Which of these definitions was most surprising or helpful to you?",
       content: (
         <div>
           <p style={s.p}>BDSM is an umbrella term for a variety of practices. It is not a single activity, but a customized language of trust between two people.</p>
@@ -48,12 +55,59 @@ export default function LearnTab({ C, s }) {
               <strong>BDSM is not abuse.</strong> The dividing line is whether an act is explicitly negotiated, mutually desired, and genuinely retractable at any moment.
             </p>
           </div>
+          <p style={{ ...s.p, fontSize: 14, marginTop: 12 }}>
+            Beginner exploration does <strong>not</strong> require pain, intercourse, humiliation, or extreme practices. It can be as simple as changing your tone of voice or choosing the music.
+          </p>
+        </div>
+      )
+    },
+    {
+      id: "marriage_consent",
+      title: "Marriage Never Replaces Consent",
+      reflect: "What does 'Enthusiastic Consent' look like for you compared to just 'agreeing'?",
+      content: (
+        <div>
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>
+              In a committed marriage, it's easy to assume consent is 'implied.' However, for power exchange and kink, consent must be even more explicit.
+            </p>
+            <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+              <li><strong>Consent is still needed:</strong> Marriage is a partnership of mutual honor, not a waiver of bodily autonomy.</li>
+              <li><strong>Silence is not consent:</strong> Freezing, going quiet, or not resisting is often a sign of overwhelm, not permission.</li>
+              <li><strong>'Maybe' means 'Not tonight':</strong> If it isn't an enthusiastic 'Yes,' treat it as a 'No' for now.</li>
+              <li><strong>Reversible:</strong> You can say 'Yes' at 8 PM and 'Stop' at 8:05 PM without needing to justify it.</li>
+            </ul>
+          </div>
+          <p style={s.p}><strong>The Goal:</strong> To ensure every activity is something you both <em>want</em> to do, not something one person is 'tolerating' for the other.</p>
+        </div>
+      )
+    },
+    {
+      id: "safewords_logic",
+      title: "Safewords are not Magic",
+      reflect: "How does it feel to know that 'Red' is a success, not a bad outcome?",
+      content: (
+        <div>
+          <p style={s.p}>Safewords are vital, but they are only as strong as the trust between you.</p>
+          <div style={s.card}>
+            <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+              <li><strong>Red means Stop:</strong> Stop immediately, drop the role, come close, be warm, and check in. No arguing or sulking.</li>
+              <li><strong>Yellow means Slow:</strong> Reduce intensity, check in, or change course. It's a 'caution' light.</li>
+              <li><strong>Character is the real safety:</strong> Safewords work because you trust your partner to value your safety more than their own immediate pleasure.</li>
+            </ul>
+          </div>
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+              <strong>Red is not a bad outcome.</strong> Using a safeword means the safety system you built is working perfectly.
+            </p>
+          </div>
         </div>
       )
     },
     {
       id: "healthy",
       title: "Healthy vs. Unhealthy Dynamics",
+      reflect: "Can you think of a time when you felt free to say 'not tonight' and felt cherished in that choice?",
       content: (
         <div>
           <div style={s.safeBox}>
@@ -84,8 +138,63 @@ export default function LearnTab({ C, s }) {
       ),
     },
     {
+      id: "marriage_consent",
+      title: "Marriage Never Replaces Consent",
+      content: (
+        <div>
+          <div style={s.warnBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+              Being married does not create automatic permission. Consent still needs to be freely given, reversible, informed, enthusiastic, and specific.
+            </p>
+          </div>
+          <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+            <li>Silence, freezing, going quiet, not resisting, or avoiding conflict are not consent.</li>
+            <li>"I said yes once" does not mean ongoing permission.</li>
+            <li>"Maybe" means "not tonight" unless it becomes a clear mutual Yes later.</li>
+            <li>Either spouse can stop, change course, or say "not tonight" without sulking, argument, or persuasion.</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: "safewords_not_magic",
+      title: "Safewords Are Not Magic",
+      content: (
+        <div>
+          <p style={s.p}>Safewords only work when both people are trustworthy, sober, attentive, and immediately willing to stop.</p>
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+              Red means: stop immediately, drop the role, come close if wanted, be warm, check in, and do not argue, sulk, persuade, or ask for justification.
+            </p>
+          </div>
+          <p style={s.p}>The real safety system is character: warmth, patience, self-control, and care for the slower partner.</p>
+        </div>
+      )
+    },
+    {
+      id: "nervous_system",
+      title: "Emotional & Nervous System Safety",
+      content: (
+        <div>
+          <p style={s.p}>Kink can touch vulnerability, shame, fear, rejection sensitivity, and old protective responses. These signs mean pause or stop warmly.</p>
+          <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+            <li><strong>Freeze:</strong> going still, quiet, blank, or unable to choose.</li>
+            <li><strong>Fawn:</strong> people-pleasing to avoid disappointing the other person.</li>
+            <li><strong>Dissociation:</strong> feeling far away, unreal, floaty, or disconnected.</li>
+            <li><strong>Shutdown:</strong> becoming unreachable, numb, or unable to communicate clearly.</li>
+          </ul>
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+              Stop warmly: "You are safe. We are stopping. Nothing is wrong with you. What do you need right now?"
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
       id: "role_responsibilities",
       title: "Role Responsibilities (Dom/Sub)",
+      reflect: "Which role (leading or surrendering) feels more naturally stretching for you right now?",
       content: (
         <div>
           <p style={s.p}>In D/s (Dominance and Submission), both roles carry heavy responsibilities for the session to be successful and safe.</p>
@@ -116,6 +225,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "beginner_mistakes",
       title: "Common Beginner Mistakes",
+      reflect: "Which of these mistakes feels most important for us to watch out for?",
       content: (
         <div>
           <div style={s.warnBox}>
@@ -133,6 +243,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "equipment_safety",
       title: "Equipment & Physical Safety",
+      reflect: "Do we have our 'Safety Shears' (blunt scissors) ready and available?",
       content: (
         <div>
           <p style={s.p}>If using any form of restraint or impact tool, safety is paramount. Improper use can lead to nerve damage or injury.</p>
@@ -156,6 +267,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "drops",
       title: "Understanding 'The Drop'",
+      reflect: "How can I best reassure you if you feel a hormonal 'drop' or vulnerability the next day?",
       content: (
         <div>
           <p style={s.p}>After an intense session, your body's chemistry changes. This can lead to a period of vulnerability or low mood known as "Drop."</p>
@@ -180,6 +292,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "frameworks",
       title: "Safety Frameworks",
+      reflect: "Which framework (SSC, 4Cs, RACK, PRICK) resonates most with your personal safety needs?",
       content: (
         <div>
           {[
@@ -207,6 +320,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "consent",
       title: "Consent Foundations (FRIES)",
+      reflect: "What does 'Enthusiastic Consent' look like for you compared to just 'agreeing'?",
       content: (
         <div>
           <p style={s.p}>A helpful way to remember the foundations of consent is the <strong>FRIES</strong> acronym:</p>
@@ -233,6 +347,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "porn_vs_reality",
       title: "Porn vs. Reality",
+      reflect: "What is one thing we've seen in media that we both agree is unsafe or unrealistic for us?",
       content: (
         <div>
           <p style={s.p}>Popular media and pornography are often poor teachers for healthy BDSM.</p>
@@ -249,8 +364,33 @@ export default function LearnTab({ C, s }) {
       )
     },
     {
+      id: "nervous_system",
+      title: "Emotional & Nervous System Safety",
+      reflect: "Which of these responses (Freeze, Fawn, etc.) do you think you'd be most likely to experience if overwhelmed?",
+      content: (
+        <div>
+          <p style={s.p}>Intimacy can trigger deep responses in our nervous system. Understanding these helps you care for each other.</p>
+          <div style={s.card}>
+            {[
+              { name: "Freeze", desc: "Feeling stuck, unable to move or speak, even if you want to stop." },
+              { name: "Fawn", desc: "Over-complying or 'people-pleasing' to avoid conflict, even if uncomfortable." },
+              { name: "Dissociation", desc: "Feeling 'checked out' or as if you are watching yourself from a distance." },
+              { name: "Shutdown", desc: "A sudden loss of energy or emotional flatness." }
+            ].map(item => (
+              <div key={item.name} style={{ marginBottom: 12 }}>
+                <span style={{ ...s.label, fontSize: 13, color: C.accent }}>{item.name}</span>
+                <p style={{ ...s.p, fontSize: 13, marginBottom: 0 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p style={s.p}><strong>The Remedy:</strong> If you notice your partner going quiet, staring blankly, or becoming overly compliant, <strong>pause immediately</strong>. Ground them with warmth, water, and eye contact.</p>
+        </div>
+      )
+    },
+    {
       id: "christian_reflection",
       title: "Faith & Christian Reflection",
+      reflect: "How does our shared faith provide a safety net for our intimacy?",
       content: (
         <div>
           <p style={s.p}>For a Christian couple, the question is not just "is this allowed?" but "does this express mutual love and honor?"</p>
@@ -261,6 +401,7 @@ export default function LearnTab({ C, s }) {
               <li><strong>Gentleness & Self-Control:</strong> Galatians 5 names these as fruits of the Spirit. Any play should deepen these qualities.</li>
               <li><strong>Honoring the Body:</strong> 1 Thessalonians 4 calls us to possess our own bodies in "holiness and honor."</li>
               <li><strong>Freedom of Conscience:</strong> Romans 14 teaches that we should not violate our own conscience or lead our spouse to violate theirs.</li>
+              <li><strong>Fruit of the Spirit Test:</strong> Does this lead to more love, joy, and peace, or more fear, contempt, and secrecy?</li>
             </ul>
           </div>
           <p style={{ ...s.p, marginTop: 12 }}>
@@ -272,6 +413,7 @@ export default function LearnTab({ C, s }) {
     {
       id: "limits",
       title: "Hard Boundaries — Do Not Cross",
+      reflect: "Do we both agree that if either of us is uncomfortable, we stop immediately without needing to justify it?",
       content: (
         <div>
           <div style={{ ...s.warnBox, borderLeftWidth: 5 }}>
@@ -287,6 +429,8 @@ export default function LearnTab({ C, s }) {
                 "Electrical play of any kind",
                 "Degradation or humiliation designed to wound dignity",
                 "Punishment dynamics or withholding affection",
+                "Consensual non-consent (CNC) or free-use scenarios",
+                "Anything involving fear, coercion, inability to speak, or inability to communicate clearly",
                 "Anything done while intoxicated",
                 "Anything copied directly from pornography",
               ].map(t => <li key={t}>{t}</li>)}
@@ -337,8 +481,19 @@ export default function LearnTab({ C, s }) {
             }}>
               {sec.content}
               
-              <div style={{ marginTop: 20, borderTop: `1px solid ${C.rule}`, paddingTop: 16 }}>
-                <span style={s.label}>How confident do you feel about this?</span>
+              <div style={{ marginTop: 24, borderTop: `2px solid ${C.rule}`, paddingTop: 20 }}>
+                <span style={s.label}>Guided Reflection</span>
+                <p style={{ ...s.p, fontSize: 14, fontWeight: 700, marginBottom: 12, color: C.accent }}>
+                  "{sec.reflect}"
+                </p>
+                <textarea
+                  style={{ ...s.input, minHeight: "80px" }}
+                  placeholder="Share your thoughts here (saved locally)..."
+                  value={reflection[sec.id] || ""}
+                  onChange={(e) => handleReflection(sec.id, e.target.value)}
+                />
+                
+                <span style={{ ...s.label, marginTop: 12 }}>How confident do you feel about this?</span>
                 <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                   {["Low", "Medium", "High"].map(level => (
                     <button

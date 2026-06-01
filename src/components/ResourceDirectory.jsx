@@ -38,6 +38,16 @@ const resources = {
       desc: "Support for people impacted by sexual, domestic, or family violence.",
       phone: "1800 385 578",
       link: "https://fullstop.org.au"
+    },
+    {
+      name: "Consent.gov.au",
+      desc: "Australian Government consent education and relationship safety information.",
+      link: "https://www.consent.gov.au"
+    },
+    {
+      name: "eSafety Commissioner",
+      desc: "Australian online safety support, image-based abuse help, and reporting pathways.",
+      link: "https://www.esafety.gov.au"
     }
   ],
   international: [
@@ -48,8 +58,33 @@ const resources = {
     },
     {
       name: "FetLife Community Guides",
-      desc: "A massive collection of community-written guides on safety, terminology, and techniques.",
+      desc: "Adult community site. Some content is useful, some is not. Filter through consent, conscience, and mutual respect.",
       link: "https://fetlife.com/guides"
+    },
+    {
+      name: "Scarleteen",
+      desc: "Consent-centred education with useful boundary and communication concepts.",
+      link: "https://www.scarleteen.com"
+    },
+    {
+      name: "National Coalition for Sexual Freedom",
+      desc: "Consent, legal, and kink-aware professional resources.",
+      link: "https://ncsfreedom.org"
+    },
+    {
+      name: "SM 101",
+      desc: "A safety-focused beginner book. Use cautiously and keep advanced material off the table.",
+      link: "https://www.goodreads.com/book/show/208357.SM_101"
+    },
+    {
+      name: "Different Loving / The Loving Dominant",
+      desc: "Books often recommended for adults learning about power exchange and communication.",
+      link: "https://www.goodreads.com"
+    },
+    {
+      name: "AASECT Therapist Directory",
+      desc: "Directory for qualified sex therapists. Look for someone aligned with your values and relationship goals.",
+      link: "https://www.aasect.org/referral-directory"
     },
     {
       name: "National Domestic Violence Hotline (US)",
