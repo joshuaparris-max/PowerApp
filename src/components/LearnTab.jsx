@@ -7,6 +7,7 @@ import { getLocal, setLocal, removeLocal } from "../utils/storage";
 
 export default function LearnTab({ C, s }) {
   const [open, setOpen] = useState(() => getLocal("learn_open", null));
+  const [confidence, setConfidence] = useState(() => getLocal("learn_confidence", {}));
 
   useEffect(() => {
     if (open) {
@@ -15,6 +16,14 @@ export default function LearnTab({ C, s }) {
       removeLocal("learn_open");
     }
   }, [open]);
+
+  useEffect(() => {
+    setLocal("learn_confidence", confidence);
+  }, [confidence]);
+
+  const handleConfidence = (id, level) => {
+    setConfidence(prev => ({ ...prev, [id]: level }));
+  };
 
   const learnSections = [
     {
@@ -123,17 +132,48 @@ export default function LearnTab({ C, s }) {
     },
     {
       id: "equipment_safety",
-      title: "Equipment Safety Basics",
+      title: "Equipment & Physical Safety",
       content: (
         <div>
-          <p style={s.p}>If using any form of restraint or impact tool, safety is paramount.</p>
+          <p style={s.p}>If using any form of restraint or impact tool, safety is paramount. Improper use can lead to nerve damage or injury.</p>
+          <div style={{ ...s.card, background: C.warnBg, border: `1px solid ${C.warnBorder}`, marginBottom: 16 }}>
+            <span style={{ ...s.label, color: C.warnBorder }}>Nerve & Circulation Safety</span>
+            <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.6, fontSize: 13, marginTop: 8 }}>
+              <li><strong>The Two-Finger Rule:</strong> Always ensure you can fit two fingers between any restraint and the skin.</li>
+              <li><strong>Wrist/Ankle Caution:</strong> Nerves are very close to the surface on the inside of wrists and ankles. Avoid direct pressure there.</li>
+              <li><strong>Impact Zones:</strong> Only strike fleshy areas (like the buttocks). Avoid the spine, kidneys, and joints.</li>
+              <li><strong>Check Frequently:</strong> Ask: "Any tingling or numbness?" If yes, release the restraint immediately.</li>
+            </ul>
+          </div>
           <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
             <li><strong>Safety Shears:</strong> Always have a pair of blunt-tipped safety scissors nearby to cut restraints in an emergency.</li>
-            <li><strong>Two-Finger Rule:</strong> You should always be able to fit two fingers between a restraint and the skin.</li>
-            <li><strong>Circulation Check:</strong> Watch for tingling, coldness, or blue/white skin. Release immediately if found.</li>
-            <li><strong>Nerve Safety:</strong> Avoid resting restraints directly on joints (wrists/ankles) or areas with thin skin over bone.</li>
             <li><strong>Never Leave Alone:</strong> A restrained person must never be left alone in a room, even for a moment.</li>
+            <li><strong>Sobriety:</strong> Never use equipment while under the influence of alcohol or substances.</li>
           </ul>
+        </div>
+      )
+    },
+    {
+      id: "drops",
+      title: "Understanding 'The Drop'",
+      content: (
+        <div>
+          <p style={s.p}>After an intense session, your body's chemistry changes. This can lead to a period of vulnerability or low mood known as "Drop."</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            <div style={{ ...s.card, padding: "14px", marginBottom: 0 }}>
+              <span style={{ ...s.label, color: C.accent }}>Sub Drop</span>
+              <p style={{ fontSize: 12, color: C.softInk, lineHeight: 1.4, margin: 0 }}>
+                Feeling sad, flat, or vulnerable after surrendering control. The brain is adjusting from a high endorphin state.
+              </p>
+            </div>
+            <div style={{ ...s.card, padding: "14px", marginBottom: 0 }}>
+              <span style={{ ...s.label, color: C.accent }}>Dom Drop</span>
+              <p style={{ fontSize: 12, color: C.softInk, lineHeight: 1.4, margin: 0 }}>
+                Feeling guilty, anxious, or questioning if they were "too much" after leading a session.
+              </p>
+            </div>
+          </div>
+          <p style={s.p}><strong>The Remedy:</strong> Consistent, gentle aftercare. Reassure each other: "You are safe, you are loved, and we are okay."</p>
         </div>
       )
     },
@@ -245,7 +285,7 @@ export default function LearnTab({ C, s }) {
                 "Heavy impact play with implements",
                 "Cutting, blood play, or needle play",
                 "Electrical play of any kind",
-                "Degradation or humiliation designed to wound",
+                "Degradation or humiliation designed to wound dignity",
                 "Punishment dynamics or withholding affection",
                 "Anything done while intoxicated",
                 "Anything copied directly from pornography",
@@ -296,6 +336,31 @@ export default function LearnTab({ C, s }) {
               animation: "fadeIn 0.2s ease-out"
             }}>
               {sec.content}
+              
+              <div style={{ marginTop: 20, borderTop: `1px solid ${C.rule}`, paddingTop: 16 }}>
+                <span style={s.label}>How confident do you feel about this?</span>
+                <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                  {["Low", "Medium", "High"].map(level => (
+                    <button
+                      key={level}
+                      onClick={() => handleConfidence(sec.id, level)}
+                      style={{
+                        ...s.btn(confidence[sec.id] === level ? "primary" : "outline"),
+                        flex: 1, padding: "8px", fontSize: 12
+                      }}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+                {confidence[sec.id] === "Low" && (
+                  <div style={{ ...s.warnBox, marginTop: 12, padding: "8px 12px" }}>
+                    <p style={{ ...s.p, fontSize: 12, marginBottom: 0 }}>
+                      If you feel low confidence, we recommend re-reading or having more conversation before moving to Step 2.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

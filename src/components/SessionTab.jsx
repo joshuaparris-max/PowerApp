@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { font } from "../constants";
 
 const checkInPrompts = [
@@ -9,7 +9,17 @@ const checkInPrompts = [
   "Is there anything you want to change?"
 ];
 
+const groundingPrompts = [
+  "Can you feel the bed/chair/floor beneath you?",
+  "Look at me — are you here with me?",
+  "What is one thing you can hear right now?",
+  "Take a slow breath with me.",
+  "What do you need right now? (Water, warmth, quiet, closeness?)"
+];
+
 export default function SessionTab({ C, s }) {
+  const [showGrounding, setShowGrounding] = useState(false);
+
   return (
     <div style={s.page}>
       <p style={s.label}>Step 4</p>
@@ -40,6 +50,43 @@ export default function SessionTab({ C, s }) {
         ))}
       </div>
 
+      <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
+        <button 
+          onClick={() => alert("Check-in requested. Slow down and talk.")}
+          style={{ ...s.btn(), flex: 1, background: "#c4a010", borderColor: "#c4a010" }}
+        >
+          Request Check-In
+        </button>
+        <button 
+          onClick={() => setShowGrounding(!showGrounding)}
+          style={{ ...s.btn("outline"), flex: 1 }}
+        >
+          {showGrounding ? "Hide Grounding" : "Grounding Tools"}
+        </button>
+      </div>
+
+      {showGrounding && (
+        <div style={{ ...s.card, background: C.faithBg, border: `1px solid ${C.accentLight}`, marginBottom: 24, animation: "fadeIn 0.2s ease-out" }}>
+          <span style={s.label}>Grounding Prompts</span>
+          <p style={{ ...s.p, fontSize: 13, marginBottom: 12 }}>Use these if someone feels overwhelmed, floaty, or disconnected.</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {groundingPrompts.map((p, i) => (
+              <div key={i} style={{ 
+                padding: "10px 14px", 
+                background: C.warmWhite, 
+                borderRadius: 6, 
+                fontSize: 14, 
+                color: C.softInk,
+                border: `1px solid ${C.rule}`,
+                fontStyle: "italic"
+              }}>
+                "{p}"
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={{ ...s.card, background: C.faithBg, border: `1px solid ${C.accentLight}`, marginBottom: 24 }}>
         <span style={{ ...s.label, color: C.accent }}>Non-Verbal Reminder</span>
         <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
@@ -48,7 +95,7 @@ export default function SessionTab({ C, s }) {
       </div>
 
       <div style={s.card}>
-        <span style={s.label}>Check-in Prompts</span>
+        <span style={s.label}>Ongoing Check-in Prompts</span>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
           {checkInPrompts.map((p, i) => (
             <div key={i} style={{ 
