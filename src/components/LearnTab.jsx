@@ -3,7 +3,6 @@ import { font } from "../constants";
 import { Icon } from "./Icon";
 import SafetyQuiz from "./SafetyQuiz";
 import Glossary from "./Glossary";
-import StepProgress from "./StepProgress";
 import { getLocal, setLocal, removeLocal } from "../utils/storage";
 
 /**
@@ -416,7 +415,6 @@ export default function LearnTab({ C, s, onNavigate }) {
 
   return (
     <div style={s.page}>
-      <StepProgress activeStep="learn" C={C} s={s} />
       <h1 style={s.h1}>Learn</h1>
       <p style={s.p}>Read these sections together fully clothed. Knowledge is the foundation of safety.</p>
       <div style={s.safeBox}>

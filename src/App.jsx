@@ -3,11 +3,13 @@ import { themes, getStyles } from "./constants";
 import { Icon } from "./components/Icon";
 import LearnTab from "./components/LearnTab";
 import ConnectTab from "./components/ConnectTab";
+import InspireTab from "./components/InspireTab";
 import PrepareTab from "./components/PrepareTab";
 import SessionTab from "./components/SessionTab";
 import ReflectTab from "./components/ReflectTab";
 import ResourceDirectory from "./components/ResourceDirectory";
 import PrivacyTab from "./components/PrivacyTab";
+import MoreTab from "./components/MoreTab";
 import Onboarding from "./components/Onboarding";
 import FlowProgress from "./components/FlowProgress";
 import { clearAllLocal, getLocal, setLocal } from "./utils/storage";
@@ -15,11 +17,13 @@ import { clearAllLocal, getLocal, setLocal } from "./utils/storage";
 const tabs = [
   { id: "learn", label: "Learn", icon: "learn", component: LearnTab },
   { id: "connect", label: "Connect", icon: "connect", component: ConnectTab },
+  { id: "inspire", label: "Inspire", icon: "inspire", component: InspireTab },
   { id: "prepare", label: "Prepare", icon: "prepare", component: PrepareTab },
   { id: "session", label: "Session", icon: "play", component: SessionTab },
   { id: "reflect", label: "Reflect", icon: "reflect", component: ReflectTab },
-  { id: "resources", label: "Resources", icon: "resources", component: ResourceDirectory },
-  { id: "privacy", label: "Privacy", icon: "privacy", component: PrivacyTab },
+  { id: "more", label: "More", icon: "settings", component: MoreTab },
+  { id: "resources", label: "Resources", icon: "resources", component: ResourceDirectory, hidden: true },
+  { id: "privacy", label: "Privacy", icon: "privacy", component: PrivacyTab, hidden: true },
 ];
 
 export default function App() {
@@ -52,17 +56,26 @@ export default function App() {
   const s = getStyles(C);
 
   const ActiveComponent = tabs.find(t => t.id === activeTab)?.component || LearnTab;
+
+  // Real-time indexing of LearnTab content for search
   const searchItems = [
-    ...tabs.map(tab => ({ tab: tab.id, title: tab.label, text: `${tab.label} section` })),
+    ...tabs.filter(t => !t.hidden).map(tab => ({ tab: tab.id, title: tab.label, text: `${tab.label} section navigation` })),
     { tab: "learn", title: "Marriage never replaces consent", text: "consent silence freeze maybe not permission" },
+    { tab: "learn", title: "Nervous System Safety", text: "freeze fawn dissociation shutdown overwhelm" },
+    { tab: "learn", title: "Christian Reflection", text: "faith spiritual conscience fruits of the spirit" },
+    { tab: "learn", title: "BDSM Definitions", text: "bondage discipline dominance submission kink sm" },
     { tab: "connect", title: "Yes No Maybe worksheet", text: "limits hard soft not now mutual yes" },
+    { tab: "inspire", title: "Fantasy Idea Generator", text: "scene inspiration ritual sensory worksheet non explicit consent" },
+    { tab: "inspire", title: "Scene Planning Worksheet", text: "dynamic mood atmosphere boundaries safewords aftercare" },
     { tab: "prepare", title: "Tonight Plan Builder", text: "safeword non-verbal aftercare stop conditions" },
     { tab: "session", title: "Traffic lights", text: "green yellow red pause stop warmth" },
     { tab: "reflect", title: "Morning debrief", text: "aftercare pressure unsafe conscience red flag" },
     { tab: "resources", title: "Australian support", text: "000 1800RESPECT Lifeline MensLine Consent.gov.au" },
     { tab: "privacy", title: "Panic clear and local data", text: "localStorage clear worksheets plan debrief" },
   ];
-  const results = searchItems.filter(item => `${item.title} ${item.text}`.toLowerCase().includes(search.toLowerCase())).slice(0, 8);
+  const results = searchItems.filter(item =>
+    `${item.title} ${item.text}`.toLowerCase().includes(search.toLowerCase())
+  ).slice(0, 8);
 
   const handlePanicClear = () => {
     if (confirm("Instantly delete all data? This cannot be undone.")) {
@@ -97,13 +110,13 @@ export default function App() {
         body { margin: 0; background: ${C.cream}; transition: background 0.3s; overflow-x: hidden; }
         #root { min-height: 100vh; }
         button { font-family: 'Lato', sans-serif; transition: all 0.2s ease-in-out; cursor: pointer; border: none; outline: 2px solid transparent; }
-        button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+        button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
           outline: 3px solid ${C.accent};
           outline-offset: 3px;
         }
         button:active { transform: scale(0.98); }
-        textarea, input { outline: 2px solid transparent; transition: border-color 0.2s, background 0.3s, color 0.3s; }
-        textarea:focus, input:focus { border-color: ${C.accent} !important; }
+        textarea, input, select { outline: 2px solid transparent; transition: border-color 0.2s, background 0.3s, color 0.3s; }
+        textarea:focus, input:focus, select:focus { border-color: ${C.accent} !important; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.rule}; border-radius: 3px; }
         
@@ -133,45 +146,51 @@ export default function App() {
           }
           .header-inner {
             width: 100%;
-            max-width: 1440px;
-            margin: 0 auto;
+            max-width: none;
+            padding: 0 40px;
           }
           .content-scroll {
             overflow-y: auto;
             flex: 1;
-            padding: 0 0 40px 112px;
+            padding: 0 40px 40px 152px;
             background:
               linear-gradient(90deg, rgba(122,92,58,0.06), transparent 28%),
               ${C.cream};
           }
           .main-nav {
-            top: 96px !important;
+            top: 0 !important;
             bottom: 0 !important;
             left: 0 !important;
             transform: none !important;
-            width: 112px !important;
+            width: 120px !important;
             max-width: none !important;
             flex-direction: column !important;
             border-top: none !important;
             border-right: 1px solid ${C.accent} !important;
             align-items: stretch !important;
             justify-content: flex-start !important;
-            padding: 16px 10px !important;
-            gap: 8px !important;
+            padding: 40px 10px !important;
+            gap: 12px !important;
+            z-index: 100;
           }
           .main-nav button {
             flex: 0 0 auto !important;
-            min-height: 72px;
+            min-height: 80px;
             border-radius: 10px;
           }
           .search-shell {
-            max-width: 1180px !important;
-            padding: 0 clamp(20px, 5vw, 72px) !important;
+            max-width: none !important;
+            padding: 0 !important;
             margin-top: 28px !important;
+          }
+          .flow-progress-container {
+            max-width: none !important;
+            padding: 0 !important;
+            margin-top: 24px !important;
           }
         }
 
-        @media (max-width: 400px) {
+        @media (max-width: 500px) {
           .main-nav .nav-label {
             display: none;
           }
@@ -250,7 +269,7 @@ export default function App() {
             </button>
           </div>
           {["learn", "connect", "prepare", "session", "reflect"].includes(activeTab) && (
-            <div style={{ maxWidth: 1180, margin: "24px auto 0", padding: "0 clamp(20px, 5vw, 72px)" }}>
+            <div className="flow-progress-container" style={{ maxWidth: 1180, margin: "24px auto 0", padding: "0 clamp(20px, 5vw, 72px)" }}>
               <FlowProgress C={C} active={activeTab} />
             </div>
           )}
@@ -276,7 +295,7 @@ export default function App() {
 
         {/* Bottom Nav */}
         <nav style={s.nav} className="main-nav" aria-label="Main navigation">
-          {tabs.map(tab => (
+          {tabs.filter(t => !t.hidden).map(tab => (
             <button 
               key={tab.id} 
               onClick={() => setActiveTab(tab.id)} 

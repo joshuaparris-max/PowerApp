@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Icon } from "./Icon";
 
 export default function Onboarding({ C, s, onComplete }) {
   const [step, setStep] = useState(0);
@@ -99,3 +100,4 @@ export default function Onboarding({ C, s, onComplete }) {
       </div>
     </div>
   );
+}

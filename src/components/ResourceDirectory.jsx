@@ -88,10 +88,16 @@ const resources = {
       link: "https://www.goodreads.com"
     },
     {
-      name: "AASECT Therapist Directory",
+      name: "AASECT Directory",
       level: "Directory",
-      desc: "Directory for qualified sex therapists. Look for someone aligned with your values and relationship goals.",
-      link: "https://www.aasect.org/referral-directory"
+      link: "https://www.aasect.org/referral-directory",
+      desc: "Global directory of certified sex therapists. Primarily US-based; limited Australian coverage.",
+    },
+    {
+      name: "Kink Aware Professionals (KAP)",
+      level: "Directory",
+      link: "https://www.kapprofessionals.org/",
+      desc: "Providers who understand alternative intimacy. Primarily US-based.",
     },
     {
       name: "National Domestic Violence Hotline (US)",
@@ -106,11 +112,23 @@ const resources = {
       link: "https://www.rainn.org"
     },
     {
-      name: "Kink Aware Professionals (KAP)",
-      level: "Directory",
-      desc: "Global directory of therapeutic and legal professionals.",
-      link: "https://www.kapprofessionals.org"
-    }
+      name: "The New Bottoming Book",
+      level: "Beginner",
+      desc: "A gentle, psychological focus on the role of surrendering control. Author: Dossie Easton",
+      link: "https://www.goodreads.com/search?q=The+New+Bottoming+Book"
+    },
+    {
+      name: "The New Topping Book",
+      level: "Beginner",
+      desc: "Focuses on the responsibility and care required when leading. Author: Dossie Easton",
+      link: "https://www.goodreads.com/book/show/230114.The_New_Topping_Book"
+    },
+    {
+      name: "SM 101",
+      level: "Advanced",
+      desc: "Comprehensive technical guide. Use with caution; some sections are advanced. Author: Jay Wiseman",
+      link: "https://www.goodreads.com/book/show/208357.SM_101"
+    },
   ]
 };
 
