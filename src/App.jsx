@@ -10,7 +10,7 @@ import ResourceDirectory from "./components/ResourceDirectory";
 import PrivacyTab from "./components/PrivacyTab";
 import Onboarding from "./components/Onboarding";
 import FlowProgress from "./components/FlowProgress";
-import { getLocal, setLocal } from "./utils/storage";
+import { clearAllLocal, getLocal, setLocal } from "./utils/storage";
 
 const tabs = [
   { id: "learn", label: "Learn", icon: "learn", component: LearnTab },
@@ -66,7 +66,7 @@ export default function App() {
 
   const handlePanicClear = () => {
     if (confirm("Instantly delete all data? This cannot be undone.")) {
-      localStorage.clear();
+      clearAllLocal();
       window.location.href = "about:blank";
     }
   };
@@ -96,13 +96,13 @@ export default function App() {
         * { box-sizing: border-box; }
         body { margin: 0; background: ${C.cream}; transition: background 0.3s; overflow-x: hidden; }
         #root { min-height: 100vh; }
-        button { font-family: 'Lato', sans-serif; transition: all 0.2s ease-in-out; cursor: pointer; border: none; outline: none; }
+        button { font-family: 'Lato', sans-serif; transition: all 0.2s ease-in-out; cursor: pointer; border: none; outline: 2px solid transparent; }
         button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
           outline: 3px solid ${C.accent};
           outline-offset: 3px;
         }
         button:active { transform: scale(0.98); }
-        textarea, input { outline: none; transition: border-color 0.2s, background 0.3s, color 0.3s; }
+        textarea, input { outline: 2px solid transparent; transition: border-color 0.2s, background 0.3s, color 0.3s; }
         textarea:focus, input:focus { border-color: ${C.accent} !important; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.rule}; border-radius: 3px; }

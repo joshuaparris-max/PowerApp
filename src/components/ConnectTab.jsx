@@ -1,27 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 import { getLocal, setLocal } from "../utils/storage";
-import { beginnerActivities, voteOptions } from "../data/activities";
+import { beginnerActivities, voteOptions, conversationCards } from "../data/activities";
 import { getMutualYesActivities } from "../utils/plan";
 
-// ConnectTab stores conversation position, Partner A/B worksheet answers, and hard limits in localStorage.
-// It gathers motive-first conversation data and only reveals mutual Yes activities for planning.
-
-const conversationCards = [
-    { prompt: "What am I curious about exploring together?", category: "Motive" },
-    { prompt: "What scares me or makes me feel uncertain?", category: "Motive" },
-    { prompt: "What would make me feel pressured or unsafe?", category: "Safety" },
-    { prompt: "What would make me feel cherished and safe during and after?", category: "Motive" },
-    { prompt: "Is there anything I am agreeing to just to avoid disappointing you?", category: "Motive" },
-    { prompt: "How do our faith and values shape what feels loving here?", category: "Values" },
-    { prompt: "What does 'tenderness' look like for me?", category: "Motive" },
-    { prompt: "What would make you feel free to say 'not tonight' at any point?", category: "Safety" },
-    { prompt: "What would make this strengthen our marriage?", category: "Connection" },
-    { prompt: "What would make this harm our marriage?", category: "Connection" },
-    { prompt: "What would loving aftercare look like for you tonight?", category: "Aftercare" },
-    { prompt: "If tonight ends with just a good conversation, how would you feel about that?", category: "Expectations" },
-];
-
+/**
+ * Step 2: Connect
+ * Conversation and boundary setting.
+ * LocalStorage keys: connect_view, connect_cardIdx, connect_partnerA, connect_partnerB, connect_hardLimitA, connect_hardLimitB
+ */
 export default function ConnectTab({ C, s, onNavigate }) {
   const [view, setView] = useState(() => getLocal("connect_view", "menu"));
   const [cardIdx, setCardIdx] = useState(() => getLocal("connect_cardIdx", 0));
@@ -31,6 +18,7 @@ export default function ConnectTab({ C, s, onNavigate }) {
   const [hardLimitA, setHardLimitA] = useState(() => getLocal("connect_hardLimitA", ""));
   const [hardLimitB, setHardLimitB] = useState(() => getLocal("connect_hardLimitB", ""));
   const [showResults, setShowResults] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
 
   useEffect(() => {
     setLocal("connect_view", view);
@@ -126,9 +114,6 @@ export default function ConnectTab({ C, s, onNavigate }) {
             <p style={{ ...s.p, fontSize: 13, marginBottom: 0, opacity: 0.8 }}>
               <strong>Important:</strong> "Maybe" or "Not now" is not permission. It means "No" until it becomes a clear, enthusiastic "Yes" later.
             </p>
-            <p style={{ ...s.p, fontSize: 13, marginBottom: 0, opacity: 0.8 }}>
-              <strong>Plan rule:</strong> Maybe, Not Now, No, Hard Limit, and unanswered items cannot enter tonight's plan.
-            </p>
           </div>
 
           <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
@@ -196,7 +181,7 @@ export default function ConnectTab({ C, s, onNavigate }) {
                   onClick={() => {
                     const text = bothYes.map(a => `✓ ${a.label}`).join("\n");
                     navigator.clipboard.writeText(`Our Mutual Safe List:\n${text}`);
-                    alert("Copied to clipboard!");
+                    setCopyStatus("Mutual Yes list copied.");
                   }}
                   style={{ ...s.btn("outline"), padding: "6px 12px", fontSize: 11 }}
                 >
@@ -204,6 +189,7 @@ export default function ConnectTab({ C, s, onNavigate }) {
                 </button>
               )}
             </div>
+            {copyStatus && <p style={{ ...s.p, fontSize: 13, marginBottom: 8, color: C.sage }}>{copyStatus}</p>}
             <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>
               Only activities where both partners marked Yes. Maybe is not permission; no persuasion; a conversation-only night is success.
             </p>
@@ -226,6 +212,19 @@ export default function ConnectTab({ C, s, onNavigate }) {
             </div>
           )}
 
+          <div style={s.safeBox}>
+            <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+              Great! Now that you have a mutual list, you can move to the Prepare tab to build tonight's plan.
+            </p>
+          </div>
+
+          <button 
+            onClick={() => onNavigate?.("prepare")} 
+            style={{ ...s.btn(), width: "100%", marginTop: 12, padding: "16px" }}
+          >
+            Ready? → Go to Prepare
+          </button>
+
           <button onClick={() => setShowResults(false)} style={{ ...s.btn("outline"), width: "100%", marginTop: 12 }}>
             Edit Responses
           </button>
@@ -236,7 +235,6 @@ export default function ConnectTab({ C, s, onNavigate }) {
 
   return (
     <div style={s.page}>
-      <p style={s.label}>Step 2</p>
       <h1 style={s.h1}>Connect</h1>
       <p style={s.p}>These tools help you talk and align before any physical exploration.</p>
       
@@ -277,10 +275,15 @@ export default function ConnectTab({ C, s, onNavigate }) {
           "Stopping after a good conversation is a complete and successful evening."
         </p>
       </div>
-      <button onClick={() => onNavigate?.("prepare")} style={{ ...s.btn(), width: "100%", marginTop: 12 }}>
-        Ready? Go to Prepare
-      </button>
+
+      {worksheetCompleted && (
+        <button 
+          onClick={() => onNavigate?.("prepare")} 
+          style={{ ...s.btn(), width: "100%", marginTop: 24, padding: "16px" }}
+        >
+          Ready? → Go to Prepare
+        </button>
+      )}
     </div>
   );
 }
-

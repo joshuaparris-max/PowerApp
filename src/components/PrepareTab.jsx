@@ -4,6 +4,11 @@ import { getLocal, setLocal } from "../utils/storage";
 import { beginnerActivities } from "../data/activities";
 import { buildPlanText, getExcludedActivities, getMutualYesFromStorage } from "../utils/plan";
 
+/**
+ * Step 3: Prepare
+ * Pre-flight checklist and plan builder.
+ * LocalStorage keys: prepare_checked, tonight_plan, connect_partnerA, connect_partnerB
+ */
 const preflightItems = [
   "We have both completed the conversation guide",
   "We have compared our Yes/No/Maybe lists",
@@ -16,8 +21,6 @@ const preflightItems = [
   "We are not carrying unresolved conflict into this evening",
 ];
 
-// Step 3: Prepare
-// LocalStorage keys: prepare_checked, tonight_plan
 export default function PrepareTab({ C, s, onNavigate }) {
   const [checked, setChecked] = useState(() => getLocal("prepare_checked", {}));
   const [plan, setPlan] = useState(() => getLocal("tonight_plan", {
@@ -36,11 +39,21 @@ export default function PrepareTab({ C, s, onNavigate }) {
     riskUnease: false
   }));
   const [showPlanBuilder, setShowPlanBuilder] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
 
   const allChecked = preflightItems.every((_, i) => checked[i]);
   const bothYes = getMutualYesFromStorage(getLocal, beginnerActivities);
   const excluded = getExcludedActivities(getLocal("connect_partnerA", {}), getLocal("connect_partnerB", {}), beginnerActivities);
   const hasRiskFlag = plan.riskConflict || plan.riskSubstances || plan.riskPressure || plan.riskUnease;
+  const importedHardLimits = [
+    getLocal("connect_hardLimitA", "") && `Partner A: ${getLocal("connect_hardLimitA", "")}`,
+    getLocal("connect_hardLimitB", "") && `Partner B: ${getLocal("connect_hardLimitB", "")}`,
+  ].filter(Boolean).join("\n");
+  const validatedPlan = {
+    ...plan,
+    hardLimits: plan.hardLimits || importedHardLimits,
+    activities: (plan.activities || []).filter(item => bothYes.some(activity => activity.id === item || activity.label === item)),
+  };
 
   useEffect(() => {
     setLocal("prepare_checked", checked);
@@ -52,21 +65,22 @@ export default function PrepareTab({ C, s, onNavigate }) {
 
   const toggleCheck = (i) => setChecked(p => ({ ...p, [i]: !p[i] }));
 
-  const toggleActivity = (label) => {
-    const newActivities = plan.activities.includes(label)
-      ? plan.activities.filter(a => a !== label)
-      : [...plan.activities, label];
+  const toggleActivity = (id) => {
+    const currentActivities = (plan.activities || []).filter(item => bothYes.some(activity => activity.id === item || activity.label === item));
+    const newActivities = currentActivities.includes(id)
+      ? currentActivities.filter(a => a !== id)
+      : [...currentActivities, id];
     setPlan({ ...plan, activities: newActivities });
   };
 
   const exportPlan = () => {
-    const text = buildPlanText(plan, bothYes);
+    const text = buildPlanText(validatedPlan, bothYes);
     navigator.clipboard.writeText(text);
-    alert("Plan copied to clipboard!");
+    setCopyStatus("Plan copied to clipboard.");
   };
 
   const exportTextFile = () => {
-    const blob = new Blob([buildPlanText(plan, bothYes)], { type: "text/plain" });
+    const blob = new Blob([buildPlanText(validatedPlan, bothYes)], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -125,11 +139,11 @@ export default function PrepareTab({ C, s, onNavigate }) {
             {bothYes.map(a => (
               <button 
                 key={a.id} 
-                onClick={() => toggleActivity(a.label)}
+                onClick={() => toggleActivity(a.id)}
                 style={{
-                  ...s.pill(plan.activities.includes(a.label) ? "white" : C.softInk, 
-                          plan.activities.includes(a.label) ? C.sage : C.warmWhite),
-                  border: `1px solid ${plan.activities.includes(a.label) ? C.sage : C.rule}`,
+                  ...s.pill((plan.activities || []).includes(a.id) || (plan.activities || []).includes(a.label) ? "white" : C.softInk,
+                          (plan.activities || []).includes(a.id) || (plan.activities || []).includes(a.label) ? C.sage : C.warmWhite),
+                  border: `1px solid ${(plan.activities || []).includes(a.id) || (plan.activities || []).includes(a.label) ? C.sage : C.rule}`,
                   cursor: "pointer"
                 }}
               >
@@ -162,7 +176,7 @@ export default function PrepareTab({ C, s, onNavigate }) {
           style={s.input}
           rows={2}
           placeholder="Hard limits, copied from your conversation..."
-          value={plan.hardLimits}
+          value={plan.hardLimits || importedHardLimits}
           onChange={e => setPlan({ ...plan, hardLimits: e.target.value })}
         />
         <textarea
@@ -219,16 +233,31 @@ export default function PrepareTab({ C, s, onNavigate }) {
       <button onClick={exportPlan} style={{ ...s.btn(), width: "100%", marginBottom: 12 }}>
         Copy Plan to Clipboard
       </button>
+      {copyStatus && <p style={{ ...s.p, fontSize: 13, textAlign: "center", color: C.sage }}>{copyStatus}</p>}
       <button onClick={exportTextFile} style={{ ...s.btn("outline"), width: "100%", marginBottom: 12 }}>
         Export Plan as .txt
       </button>
+
+      <div style={s.safeBox}>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>
+          Your plan is ready! Now you can move to the Session Safety tab. Keep it visible during your session.
+        </p>
+      </div>
+
+      <button 
+        onClick={() => onNavigate?.("session")} 
+        style={{ ...s.btn(), width: "100%", marginTop: 12, padding: "16px" }}
+      >
+        Ready? → Go to Session
+      </button>
+
       <button 
         onClick={() => {
           if (confirm("Clear this plan?")) {
             setPlan({ goal: "", safeword: "", nonVerbal: "", activities: [], hardLimits: "", softLimits: "", aftercare: "", stopConditions: "", checkInTime: "", riskConflict: false, riskSubstances: false, riskPressure: false, riskUnease: false });
           }
         }} 
-        style={{ ...s.btn("outline"), width: "100%", color: "#c44a3a", borderColor: "#c44a3a" }}
+        style={{ ...s.btn("outline"), width: "100%", color: "#c44a3a", borderColor: "#c44a3a", marginTop: 12 }}
       >
         Clear Plan
       </button>
@@ -237,7 +266,6 @@ export default function PrepareTab({ C, s, onNavigate }) {
 
   return (
     <div style={s.page}>
-      <p style={s.label}>Step 3</p>
       <h1 style={s.h1}>Prepare</h1>
       <p style={s.p}>Safety happens before you start. Complete the checklist and build your plan.</p>
 
@@ -308,9 +336,15 @@ export default function PrepareTab({ C, s, onNavigate }) {
           "Preparation is an act of care. It shows you value your partner's safety as much as your own."
         </p>
       </div>
-      <button onClick={() => onNavigate?.("session")} style={{ ...s.btn(), width: "100%", marginTop: 12 }}>
-        Ready to keep safety visible? Go to Session
-      </button>
+
+      {allChecked && (
+        <button 
+          onClick={() => setShowPlanBuilder(true)} 
+          style={{ ...s.btn(), width: "100%", marginTop: 24, padding: "16px" }}
+        >
+          Ready? → Go to Plan Builder
+        </button>
+      )}
     </div>
   );
 }

@@ -467,7 +467,7 @@ export default function LearnTab({ C, s, onNavigate }) {
               <div style={{ marginTop: 24, borderTop: `2px solid ${C.rule}`, paddingTop: 20 }}>
                 <span style={s.label}>Guided Reflection</span>
                 <p style={{ ...s.p, fontSize: 14, fontWeight: 700, marginBottom: 12, color: C.accent }}>
-                  "{sec.reflect}"
+                  "{sec.reflect || "What is one sentence we should say back to each other before moving on?"}"
                 </p>
                 <textarea
                   style={{ ...s.input, minHeight: "80px" }}

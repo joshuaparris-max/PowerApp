@@ -36,6 +36,21 @@ export const beginnerActivities = [
   { id: "conscience_check", label: "Pause if either person feels spiritual unease", category: "Faith/Conscience" },
 ];
 
+export const conversationCards = [
+  { prompt: "What am I curious about exploring together?", category: "Motive" },
+  { prompt: "What scares me or makes me feel uncertain?", category: "Motive" },
+  { prompt: "What would make me feel pressured or unsafe?", category: "Safety" },
+  { prompt: "What would make me feel cherished and safe during and after?", category: "Motive" },
+  { prompt: "Is there anything I am agreeing to just to avoid disappointing you?", category: "Motive" },
+  { prompt: "How do our faith and values shape what feels loving here?", category: "Values" },
+  { prompt: "What does 'tenderness' look like for me?", category: "Motive" },
+  { prompt: "What would make you feel free to say 'not tonight' at any point?", category: "Safety" },
+  { prompt: "What would make this strengthen our marriage?", category: "Connection" },
+  { prompt: "What would make this harm our marriage?", category: "Connection" },
+  { prompt: "What would loving aftercare look like for you tonight?", category: "Aftercare" },
+  { prompt: "If tonight ends with just a good conversation, how would you feel about that?", category: "Expectations" },
+];
+
 export const highRiskActivities = [
   "breath play",
   "choking",

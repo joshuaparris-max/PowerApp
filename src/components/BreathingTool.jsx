@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 
+const phases = [
+  { name: "Inhale", size: 220 },
+  { name: "Hold", size: 220 },
+  { name: "Exhale", size: 120 },
+  { name: "Hold", size: 120 },
+];
+
 export default function BreathingTool({ C, s }) {
   const [isActive, setIsActive] = useState(false);
-  const [phase, setPhase] = useState("Inhale"); // Inhale, Hold, Exhale, Hold
+  const [phaseIndex, setPhaseIndex] = useState(0);
   const [seconds, setSeconds] = useState(4);
   const [totalSeconds, setTotalSeconds] = useState(0);
+  const phase = phases[phaseIndex];
 
   useEffect(() => {
     let interval = null;
@@ -13,13 +21,7 @@ export default function BreathingTool({ C, s }) {
       interval = setInterval(() => {
         setSeconds((prev) => {
           if (prev === 1) {
-            // Switch phases in order: Inhale -> Hold (In) -> Exhale -> Hold (Out)
-            setPhase((currentPhase) => {
-              if (currentPhase === "Inhale") return "Hold "; // Hold after inhale
-              if (currentPhase === "Hold ") return "Exhale";
-              if (currentPhase === "Exhale") return "Hold";  // Hold after exhale
-              return "Inhale";
-            });
+            setPhaseIndex(current => (current + 1) % phases.length);
             return 4;
           }
           return prev - 1;
@@ -29,21 +31,12 @@ export default function BreathingTool({ C, s }) {
     } else {
       clearInterval(interval);
       setSeconds(4);
-      setPhase("Inhale");
+      setPhaseIndex(0);
     }
     return () => clearInterval(interval);
   }, [isActive]);
 
-  // Visual size logic: Inhale grows, Hold stays large, Exhale shrinks, Hold stays small
-  const getVisualSize = () => {
-    if (!isActive) return 160;
-    if (phase === "Inhale") return 220;
-    if (phase === "Hold ") return 220;
-    if (phase === "Exhale") return 120;
-    return 120; // Hold (Out)
-  };
-
-  const size = getVisualSize();
+  const size = isActive ? phase.size : 160;
 
   return (
     <div style={{ ...s.card, textAlign: "center", padding: "32px 24px", overflow: "hidden" }}>
@@ -60,7 +53,7 @@ export default function BreathingTool({ C, s }) {
           borderRadius: "50%",
           background: C.accent,
           opacity: 0.15,
-          transition: phase === "Inhale" || phase === "Exhale" ? "all 4s linear" : "none",
+          transition: phase.name === "Inhale" || phase.name === "Exhale" ? "all 4s linear" : "none",
           position: "absolute"
         }} />
         <div style={{
@@ -76,7 +69,7 @@ export default function BreathingTool({ C, s }) {
       </div>
 
       <h3 style={{ fontFamily: font.serif, fontSize: 24, color: C.ink, marginBottom: 8, height: 32 }}>
-        {isActive ? phase.trim() : "Box Breathing"}
+        {isActive ? phase.name : "Box Breathing"}
       </h3>
       
       <p style={{ ...s.p, fontSize: 14, marginBottom: 24, opacity: 0.7 }}>

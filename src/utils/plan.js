@@ -26,12 +26,14 @@ export function getMutualYesFromStorage(getLocal, activities = beginnerActivitie
 }
 
 export function buildPlanText(plan = {}, mutualActivities = []) {
+  const selectedIds = new Set(plan.activities || []);
+  const selectedActivities = mutualActivities.filter(activity => selectedIds.has(activity.id) || selectedIds.has(activity.label));
   return [
     "POWERAPP TONIGHT PLAN",
     "",
     `Shared goal: ${plan.goal || "Connection, honesty, and care. Conversation-only is success."}`,
     `Mutual yes items only: ${mutualActivities.map(a => a.label).join(", ") || "None selected"}`,
-    `Selected for tonight: ${(plan.activities || []).join(", ") || "None selected"}`,
+    `Selected for tonight: ${selectedActivities.map(a => a.label).join(", ") || "None selected"}`,
     `Hard limits: ${plan.hardLimits || "Not recorded in this plan"}`,
     `Soft limits / not-now items: ${plan.softLimits || "Excluded from tonight"}`,
     `Safeword: ${plan.safeword || "Not set"}`,
