@@ -30,6 +30,18 @@ export default function PrivacyTab({ C, s }) {
         </ul>
       </div>
 
+      <div style={s.card}>
+        <span style={s.label}>Device Swapping & Shared Access</span>
+        <p style={{ ...s.p, fontSize: 14, marginBottom: 12 }}>
+          PowerApp is built for <strong>device-swapping</strong>. Since all data is stored locally on this specific phone or computer:
+        </p>
+        <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.6, fontSize: 13 }}>
+          <li>One partner fills their worksheet, then passes the device to the other.</li>
+          <li>You cannot 'sync' data between two different phones.</li>
+          <li>This design ensures that your sensitive data never leaves your physical control.</li>
+        </ul>
+      </div>
+
       <div style={s.warnBox}>
         <span style={{ ...s.label, color: C.warnBorder }}>Device Security</span>
         <p style={{ ...s.p, fontSize: 14, marginBottom: 0 }}>

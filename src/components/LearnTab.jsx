@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { font } from "../constants";
 import { Icon } from "./Icon";
 import SafetyQuiz from "./SafetyQuiz";
+import Glossary from "./Glossary";
 import { getLocal, setLocal, removeLocal } from "../utils/storage";
 
 export default function LearnTab({ C, s }) {
@@ -72,6 +73,69 @@ export default function LearnTab({ C, s }) {
           </p>
         </div>
       ),
+    },
+    {
+      id: "role_responsibilities",
+      title: "Role Responsibilities (Dom/Sub)",
+      content: (
+        <div>
+          <p style={s.p}>In D/s (Dominance and Submission), both roles carry heavy responsibilities for the session to be successful and safe.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            <div style={{ ...s.card, padding: "14px", marginBottom: 0 }}>
+              <span style={{ ...s.label, color: C.accent }}>Dominant</span>
+              <ul style={{ color: C.softInk, paddingLeft: 14, fontSize: 13, lineHeight: 1.6 }}>
+                <li>Directs the pace and flow</li>
+                <li>Maintains safety checks</li>
+                <li>Prioritizes Sub's well-being</li>
+                <li>Responsible for Aftercare</li>
+              </ul>
+            </div>
+            <div style={{ ...s.card, padding: "14px", marginBottom: 0 }}>
+              <span style={{ ...s.label, color: C.accent }}>Submissive</span>
+              <ul style={{ color: C.softInk, paddingLeft: 14, fontSize: 13, lineHeight: 1.6 }}>
+                <li>Honest about limits</li>
+                <li>Uses safewords clearly</li>
+                <li>Communicates needs</li>
+                <li>Active participant in trust</li>
+              </ul>
+            </div>
+          </div>
+          <p style={s.p}><strong>The Dominant does not 'own' the Submissive.</strong> The power is a gift freely given, which can be taken back at any second with a safeword.</p>
+        </div>
+      )
+    },
+    {
+      id: "beginner_mistakes",
+      title: "Common Beginner Mistakes",
+      content: (
+        <div>
+          <div style={s.warnBox}>
+            <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+              <li><strong>Skipping Negotiation:</strong> Thinking you can 'just wing it.' Safety requires clear agreements first.</li>
+              <li><strong>Poor Safeword Use:</strong> Waiting too long to call Yellow or Red out of fear of 'ruining the mood.'</li>
+              <li><strong>Ignoring Aftercare:</strong> Assuming everything is fine because the session ended. Emotions need processing.</li>
+              <li><strong>Copying Media:</strong> Trying to replicate porn or movies instead of listening to your partner's actual body and voice.</li>
+              <li><strong>Assuming Consent is Permanent:</strong> Thinking a 'Yes' last week applies to today.</li>
+            </ul>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: "equipment_safety",
+      title: "Equipment Safety Basics",
+      content: (
+        <div>
+          <p style={s.p}>If using any form of restraint or impact tool, safety is paramount.</p>
+          <ul style={{ color: C.softInk, paddingLeft: 18, lineHeight: 1.8, fontSize: 14 }}>
+            <li><strong>Safety Shears:</strong> Always have a pair of blunt-tipped safety scissors nearby to cut restraints in an emergency.</li>
+            <li><strong>Two-Finger Rule:</strong> You should always be able to fit two fingers between a restraint and the skin.</li>
+            <li><strong>Circulation Check:</strong> Watch for tingling, coldness, or blue/white skin. Release immediately if found.</li>
+            <li><strong>Nerve Safety:</strong> Avoid resting restraints directly on joints (wrists/ankles) or areas with thin skin over bone.</li>
+            <li><strong>Never Leave Alone:</strong> A restrained person must never be left alone in a room, even for a moment.</li>
+          </ul>
+        </div>
+      )
     },
     {
       id: "frameworks",
@@ -200,6 +264,8 @@ export default function LearnTab({ C, s }) {
       <p style={s.p}>Read these sections together fully clothed. Knowledge is the foundation of safety.</p>
       
       <SafetyQuiz C={C} s={s} />
+      
+      <Glossary C={C} s={s} />
       
       <hr style={s.divider} />
       {learnSections.map(sec => (

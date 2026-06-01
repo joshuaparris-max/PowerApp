@@ -8,6 +8,7 @@ import SessionTab from "./components/SessionTab";
 import ReflectTab from "./components/ReflectTab";
 import ResourceDirectory from "./components/ResourceDirectory";
 import PrivacyTab from "./components/PrivacyTab";
+import Onboarding from "./components/Onboarding";
 import { getLocal, setLocal } from "./utils/storage";
 
 const tabs = [
@@ -23,6 +24,7 @@ const tabs = [
 export default function App() {
   const [activeTab, setActiveTab] = useState(() => getLocal("activeTab", "learn"));
   const [themeMode, setThemeMode] = useState(() => getLocal("themeMode", "light"));
+  const [showOnboarding, setShowOnboarding] = useState(() => !getLocal("hasOnboarded", false));
 
   useEffect(() => {
     setLocal("activeTab", activeTab);
@@ -43,6 +45,23 @@ export default function App() {
       window.location.reload();
     }
   };
+
+  const handleOnboardingComplete = () => {
+    setLocal("hasOnboarded", true);
+    setShowOnboarding(false);
+  };
+
+  if (showOnboarding) {
+    return (
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap');
+          body { margin: 0; background: ${C.cream}; }
+        `}</style>
+        <Onboarding C={C} s={s} onComplete={handleOnboardingComplete} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -87,7 +106,7 @@ export default function App() {
         {/* Header */}
         <div style={s.header}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
+            <div onClick={() => setShowOnboarding(true)} style={{ cursor: "pointer" }}>
               <h1 style={s.headerTitle}>PowerApp</h1>
               <div style={s.headerSub}>Private · Educational · Safety-First</div>
             </div>

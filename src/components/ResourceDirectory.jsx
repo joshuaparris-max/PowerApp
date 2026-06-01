@@ -42,6 +42,16 @@ const resources = {
   ],
   international: [
     {
+      name: "The New Topping Book / New Bottoming Book",
+      desc: "Widely considered the 'gold standard' for beginner education on ethical power exchange and roles.",
+      link: "https://www.goodreads.com/book/show/230114.The_New_Topping_Book"
+    },
+    {
+      name: "FetLife Community Guides",
+      desc: "A massive collection of community-written guides on safety, terminology, and techniques.",
+      link: "https://fetlife.com/guides"
+    },
+    {
       name: "National Domestic Violence Hotline (US)",
       desc: "Confidential support for anyone seeking resources in the US.",
       phone: "1-800-799-7233",
