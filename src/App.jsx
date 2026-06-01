@@ -112,6 +112,13 @@ export default function App() {
         * { box-sizing: border-box; }
         body { margin: 0; background: ${C.cream}; transition: background 0.3s; overflow-x: hidden; }
         #root { min-height: 100vh; }
+        
+        .app-container {
+          padding-bottom: 80px;
+        }
+        .ActiveComponentWrapper {
+          padding: 0 20px;
+        }
         button { font-family: 'Lato', sans-serif; transition: all 0.2s ease-in-out; cursor: pointer; border: none; outline: 2px solid transparent; }
         button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
           outline: 3px solid ${C.accent};
@@ -133,63 +140,66 @@ export default function App() {
 
         @media (min-width: 768px) {
           .app-container {
-            box-shadow: none;
-            margin: 0 !important;
-            border-radius: 0;
-            overflow: hidden;
-            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            grid-template-rows: auto 1fr;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden;
+            margin: 0 !important;
+            box-shadow: none;
             border: none;
+            padding-bottom: 0;
+          }
+          .ActiveComponentWrapper {
+            padding: 0 40px;
           }
           .app-header {
-            flex-shrink: 0;
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            position: sticky;
+            top: 0;
+            z-index: 10;
             box-shadow: 0 1px 0 ${C.rule};
+          }
+          .main-nav {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+            position: relative !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+            width: 120px !important;
+            height: 100vh !important;
+            flex-direction: column !important;
+            border-top: none !important;
+            border-right: 1px solid ${C.accent} !important;
+            padding: 40px 10px !important;
+            gap: 12px !important;
+            z-index: 100;
+          }
+          .content-scroll {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            overflow-y: auto;
+            padding: 0 0 60px 0;
+            background: ${C.cream};
           }
           .header-inner {
             width: 100%;
             max-width: none;
             padding: 0 40px;
           }
-          .content-scroll {
-            overflow-y: auto;
-            flex: 1;
-            padding: 0 40px 40px 152px;
-            background:
-              linear-gradient(90deg, rgba(122,92,58,0.06), transparent 28%),
-              ${C.cream};
-          }
-          .main-nav {
-            top: 0 !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            transform: none !important;
-            width: 120px !important;
-            max-width: none !important;
-            flex-direction: column !important;
-            border-top: none !important;
-            border-right: 1px solid ${C.accent} !important;
-            align-items: stretch !important;
-            justify-content: flex-start !important;
-            padding: 40px 10px !important;
-            gap: 12px !important;
-            z-index: 100;
+          .search-shell, .flow-progress-container, .ActiveComponentWrapper {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 40px;
           }
           .main-nav button {
             flex: 0 0 auto !important;
             min-height: 80px;
             border-radius: 10px;
-          }
-          .search-shell {
-            max-width: none !important;
-            padding: 0 !important;
-            margin-top: 28px !important;
-          }
-          .flow-progress-container {
-            max-width: none !important;
-            padding: 0 !important;
-            margin-top: 24px !important;
           }
         }
 
@@ -276,7 +286,9 @@ export default function App() {
               <FlowProgress C={C} active={activeTab} />
             </div>
           )}
-          <ActiveComponent C={C} s={s} onNavigate={setActiveTab} />
+          <div className="ActiveComponentWrapper">
+            <ActiveComponent C={C} s={s} onNavigate={setActiveTab} />
+          </div>
         </div>
 
         {showSearch && (
