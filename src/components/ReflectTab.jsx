@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { C, s, font } from "../constants";
+import { font } from "../constants";
+import BreathingTool from "./BreathingTool";
 
 const aftercareItems = [
   { category: "Physical", items: ["Get warm — blanket, close together", "Drink water", "Eat something if needed", "Check for any physical discomfort or tenderness", "Slow breathing together"] },
@@ -19,7 +20,7 @@ const debriefQuestions = [
   { q: "Is there anything you need from me today?", note: "End here — tend to each other." },
 ];
 
-export default function ReflectTab() {
+export default function ReflectTab({ C, s }) {
   const [view, setView] = useState(() => localStorage.getItem("reflect_view") || "menu");
   const [answers, setAnswers] = useState(() => JSON.parse(localStorage.getItem("reflect_answers")) || {});
 
@@ -91,6 +92,9 @@ export default function ReflectTab() {
       <p style={s.label}>Aftercare &amp; Integration</p>
       <h1 style={s.h1}>Reflect</h1>
       <p style={s.p}>The session isn't over until you've cared for each other and checked in honestly.</p>
+
+      <BreathingTool C={C} s={s} />
+
       <hr style={s.divider} />
       <button onClick={() => setView("aftercare")} style={{
         ...s.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${C.rule}`, display: "block", marginBottom: 12,

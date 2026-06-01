@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { C, s, font } from "../constants";
+import { font } from "../constants";
 
 const preflightItems = [
   "We have both completed the conversation guide",
@@ -13,7 +13,7 @@ const preflightItems = [
   "We are not carrying unresolved conflict into this evening",
 ];
 
-export default function PlayTab() {
+export default function PlayTab({ C, s }) {
   const [checked, setChecked] = useState(() => JSON.parse(localStorage.getItem("play_checked")) || {});
   const allChecked = preflightItems.every((_, i) => checked[i]);
 

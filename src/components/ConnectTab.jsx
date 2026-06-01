@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { C, s, font } from "../constants";
+import { font } from "../constants";
 
 const conversationCards = [
   { prompt: "What made you curious about exploring this together?", category: "Curiosity" },
@@ -31,7 +31,7 @@ const beginner_activities = [
   { id: "instructions", label: "Giving and receiving gentle instructions", category: "Power" },
 ];
 
-export default function ConnectTab() {
+export default function ConnectTab({ C, s }) {
   const [view, setView] = useState(() => localStorage.getItem("connect_view") || "menu");
   const [cardIdx, setCardIdx] = useState(() => parseInt(localStorage.getItem("connect_cardIdx")) || 0);
   const [partnerA, setPartnerA] = useState(() => JSON.parse(localStorage.getItem("connect_partnerA")) || {});
@@ -171,7 +171,21 @@ export default function ConnectTab() {
       ) : (
         <>
           <div style={{ ...s.safeBox, marginBottom: 20 }}>
-            <span style={{ ...s.label, color: C.sage }}>✓ Safe to Try Together</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <span style={{ ...s.label, color: C.sage, marginBottom: 0 }}>✓ Safe to Try Together</span>
+              {bothYes.length > 0 && (
+                <button 
+                  onClick={() => {
+                    const text = bothYes.map(a => `✓ ${a.label}`).join("\n");
+                    navigator.clipboard.writeText(`Mutual Safe List:\n${text}`);
+                    alert("Copied to clipboard!");
+                  }}
+                  style={{ ...s.btn("outline"), padding: "4px 8px", fontSize: 11 }}
+                >
+                  Copy
+                </button>
+              )}
+            </div>
             <p style={{ ...s.p, fontSize: 13, marginBottom: 10 }}>Only activities where both partners marked Yes.</p>
             {bothYes.length === 0
               ? <p style={{ color: C.muted, fontSize: 14, fontStyle: "italic" }}>No mutual Yes items yet — that's okay. Have more conversation first.</p>

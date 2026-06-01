@@ -1,17 +1,34 @@
-export const C = {
-  cream: "#f9f6f0",
-  warmWhite: "#fdfaf5",
-  ink: "#2c2416",
-  softInk: "#4a3f2f",
-  muted: "#8a7a65",
-  accent: "#7a5c3a",
-  accentLight: "#c4a882",
-  rule: "#d9cfc0",
-  sage: "#5a8a6a",
-  sageBg: "#f0f5f2",
-  warnBg: "#fff8f0",
-  warnBorder: "#c4824a",
-  faithBg: "#f5f0f8",
+export const themes = {
+  light: {
+    cream: "#f9f6f0",
+    warmWhite: "#fdfaf5",
+    ink: "#2c2416",
+    softInk: "#4a3f2f",
+    muted: "#8a7a65",
+    accent: "#7a5c3a",
+    accentLight: "#c4a882",
+    rule: "#d9cfc0",
+    sage: "#5a8a6a",
+    sageBg: "#f0f5f2",
+    warnBg: "#fff8f0",
+    warnBorder: "#c4824a",
+    faithBg: "#f5f0f8",
+  },
+  dark: {
+    cream: "#1a1612",
+    warmWhite: "#241f1a",
+    ink: "#f9f6f0",
+    softInk: "#d9cfc0",
+    muted: "#8a7a65",
+    accent: "#c4a882",
+    accentLight: "#7a5c3a",
+    rule: "#3d352b",
+    sage: "#7db38e",
+    sageBg: "#1e2a22",
+    warnBg: "#2a1e14",
+    warnBorder: "#c4824a",
+    faithBg: "#241a2a",
+  }
 };
 
 export const font = {
@@ -19,7 +36,7 @@ export const font = {
   sans: "'Lato', system-ui, sans-serif",
 };
 
-export const s = {
+export const getStyles = (C) => ({
   app: {
     fontFamily: font.sans,
     background: C.cream,
@@ -29,6 +46,7 @@ export const s = {
     position: "relative",
     paddingBottom: 80,
     color: C.ink,
+    transition: "background 0.3s, color 0.3s",
   },
   header: {
     background: C.ink,
@@ -37,6 +55,7 @@ export const s = {
     position: "sticky",
     top: 0,
     zIndex: 10,
+    transition: "background 0.3s, color 0.3s",
   },
   headerTitle: {
     fontFamily: font.serif,
@@ -63,6 +82,7 @@ export const s = {
     display: "flex",
     borderTop: `2px solid ${C.accent}`,
     zIndex: 20,
+    transition: "background 0.3s",
   },
   navBtn: (active) => ({
     flex: 1,
@@ -105,6 +125,7 @@ export const s = {
     borderRadius: 8,
     padding: "16px 18px",
     marginBottom: 12,
+    transition: "background 0.3s, border-color 0.3s",
   },
   warnBox: {
     background: C.warnBg,
@@ -149,6 +170,7 @@ export const s = {
     fontSize: 14,
     cursor: "pointer",
     letterSpacing: 0.5,
+    transition: "all 0.2s",
   }),
   input: {
     width: "100%",
@@ -162,10 +184,15 @@ export const s = {
     marginBottom: 10,
     boxSizing: "border-box",
     resize: "vertical",
+    transition: "background 0.3s, border-color 0.3s, color 0.3s",
   },
   divider: {
     border: "none",
     borderTop: `1px solid ${C.rule}`,
     margin: "20px 0",
   },
-};
+});
+
+// For backward compatibility and initial load
+export const C = themes.light;
+export const s = getStyles(C);
