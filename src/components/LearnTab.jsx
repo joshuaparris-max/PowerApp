@@ -447,9 +447,10 @@ export default function LearnTab({ C, s }) {
       <h1 style={s.h1}>Learn</h1>
       <p style={s.p}>Read these sections together fully clothed. Knowledge is the foundation of safety.</p>
       
-      <SafetyQuiz C={C} s={s} />
-      
-      <Glossary C={C} s={s} />
+      <div className="wide-card-grid">
+        <SafetyQuiz C={C} s={s} />
+        <Glossary C={C} s={s} />
+      </div>
       
       <hr style={s.divider} />
       {learnSections.map(sec => (

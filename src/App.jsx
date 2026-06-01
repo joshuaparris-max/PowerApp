@@ -94,7 +94,12 @@ export default function App() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap');
         * { box-sizing: border-box; }
         body { margin: 0; background: ${C.cream}; transition: background 0.3s; overflow-x: hidden; }
+        #root { min-height: 100vh; }
         button { font-family: 'Lato', sans-serif; transition: all 0.2s ease-in-out; cursor: pointer; border: none; outline: none; }
+        button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+          outline: 3px solid ${C.accent};
+          outline-offset: 3px;
+        }
         button:active { transform: scale(0.98); }
         textarea, input { outline: none; transition: border-color 0.2s, background 0.3s, color 0.3s; }
         textarea:focus, input:focus { border-color: ${C.accent} !important; }
@@ -111,26 +116,72 @@ export default function App() {
 
         @media (min-width: 768px) {
           .app-container {
-            box-shadow: 0 0 60px rgba(0,0,0,0.15);
-            margin: 40px auto !important;
-            border-radius: 16px;
+            box-shadow: none;
+            margin: 0 !important;
+            border-radius: 0;
             overflow: hidden;
-            height: calc(100vh - 80px);
+            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            border: 1px solid ${C.rule};
+            border: none;
+          }
+          .app-header {
+            flex-shrink: 0;
+            box-shadow: 0 1px 0 ${C.rule};
+          }
+          .header-inner {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
           }
           .content-scroll {
             overflow-y: auto;
             flex: 1;
-            padding-bottom: 40px;
+            padding: 0 0 40px 112px;
+            background:
+              linear-gradient(90deg, rgba(122,92,58,0.06), transparent 28%),
+              ${C.cream};
+          }
+          .main-nav {
+            top: 96px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+            width: 112px !important;
+            max-width: none !important;
+            flex-direction: column !important;
+            border-top: none !important;
+            border-right: 1px solid ${C.accent} !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            padding: 16px 10px !important;
+            gap: 8px !important;
+          }
+          .main-nav button {
+            flex: 0 0 auto !important;
+            min-height: 72px;
+            border-radius: 10px;
+          }
+          .search-shell {
+            max-width: 1180px !important;
+            padding: 0 clamp(20px, 5vw, 72px) !important;
+            margin-top: 28px !important;
+          }
+        }
+
+        @media (min-width: 1120px) {
+          .content-scroll .wide-card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
           }
         }
       `}</style>
       <div style={s.app} className="app-container">
         {/* Header */}
-        <div style={s.header}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={s.header} className="app-header">
+          <div className="header-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div onClick={() => setShowOnboarding(true)} style={{ cursor: "pointer" }}>
               <h1 style={s.headerTitle}>PowerApp</h1>
               <div style={s.headerSub}>Private · Educational · Safety-First</div>
@@ -183,7 +234,7 @@ export default function App() {
 
         {/* Active tab */}
         <div key={activeTab} className="page-enter-active content-scroll">
-          <div style={{ maxWidth: 600, margin: "16px auto 0", padding: "0 24px" }}>
+          <div className="search-shell" style={{ maxWidth: 1180, margin: "16px auto 0", padding: "0 24px" }}>
             <button onClick={() => setShowSearch(true)} style={{ ...s.btn("outline"), width: "100%", textAlign: "left", color: C.muted }}>
               Search the app... Ctrl/Cmd + K
             </button>
@@ -209,7 +260,7 @@ export default function App() {
         )}
 
         {/* Bottom Nav */}
-        <nav style={s.nav} aria-label="Main navigation">
+        <nav style={s.nav} className="main-nav" aria-label="Main navigation">
           {tabs.map(tab => (
             <button 
               key={tab.id} 

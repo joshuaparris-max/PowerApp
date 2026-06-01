@@ -42,8 +42,8 @@ export const getStyles = (C) => ({
     background: C.cream,
     minHeight: "100vh",
     width: "100%",
-    maxWidth: 800, // Increased for better desktop feel
-    margin: "0 auto",
+    maxWidth: "none",
+    margin: 0,
     position: "relative",
     paddingBottom: 80,
     color: C.ink,
@@ -54,7 +54,7 @@ export const getStyles = (C) => ({
   header: {
     background: C.ink,
     color: C.cream,
-    padding: "24px 24px 20px",
+    padding: "24px clamp(20px, 4vw, 56px) 20px",
     position: "sticky",
     top: 0,
     zIndex: 10,
@@ -80,7 +80,7 @@ export const getStyles = (C) => ({
     left: "50%",
     transform: "translateX(-50%)",
     width: "100%",
-    maxWidth: 800, // Matches app maxWidth
+    maxWidth: "none",
     background: C.ink,
     display: "flex",
     borderTop: `2px solid ${C.accent}`,
@@ -105,8 +105,8 @@ export const getStyles = (C) => ({
     transition: "color 0.2s",
   }),
   page: { 
-    padding: "32px 24px",
-    maxWidth: 600, // Keep content readable
+    padding: "clamp(28px, 4vw, 56px) clamp(20px, 5vw, 72px)",
+    maxWidth: 1180,
     margin: "0 auto",
     width: "100%",
   },
