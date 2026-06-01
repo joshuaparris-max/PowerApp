@@ -27,6 +27,16 @@ export default function MoreTab({ C, s, onNavigate }) {
           <strong>Panic Clear:</strong> The red button in the header instantly deletes all your local data and redirects to a blank page.
         </p>
       </div>
+
+      <div style={{ marginTop: 40, textAlign: "center", opacity: 0.1 }}>
+        <button 
+          onClick={() => onNavigate("covenant")}
+          style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 10 }}
+          aria-label="Covenant"
+        >
+          ·
+        </button>
+      </div>
     </div>
   );
 }

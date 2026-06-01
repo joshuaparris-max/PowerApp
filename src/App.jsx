@@ -10,6 +10,7 @@ import ReflectTab from "./components/ReflectTab";
 import ResourceDirectory from "./components/ResourceDirectory";
 import PrivacyTab from "./components/PrivacyTab";
 import MoreTab from "./components/MoreTab";
+import CovenantTab from "./components/CovenantTab";
 import Onboarding from "./components/Onboarding";
 import FlowProgress from "./components/FlowProgress";
 import { clearAllLocal, getLocal, setLocal } from "./utils/storage";
@@ -22,6 +23,7 @@ const tabs = [
   { id: "session", label: "Session", icon: "play", component: SessionTab },
   { id: "reflect", label: "Reflect", icon: "reflect", component: ReflectTab },
   { id: "more", label: "More", icon: "settings", component: MoreTab },
+  { id: "covenant", label: "Covenant", component: CovenantTab, hidden: true },
   { id: "resources", label: "Resources", icon: "resources", component: ResourceDirectory, hidden: true },
   { id: "privacy", label: "Privacy", icon: "privacy", component: PrivacyTab, hidden: true },
 ];
@@ -72,6 +74,7 @@ export default function App() {
     { tab: "reflect", title: "Morning debrief", text: "aftercare pressure unsafe conscience red flag" },
     { tab: "resources", title: "Australian support", text: "000 1800RESPECT Lifeline MensLine Consent.gov.au" },
     { tab: "privacy", title: "Panic clear and local data", text: "localStorage clear worksheets plan debrief" },
+    { tab: "covenant", title: "CovenantPower", text: "leadership submission sacred intimacy biblical marriage" },
   ];
   const results = searchItems.filter(item =>
     `${item.title} ${item.text}`.toLowerCase().includes(search.toLowerCase())
